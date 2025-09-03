@@ -1,9 +1,10 @@
+// package.json
 {
   "name": "hullify",
   "private": true,
   "type": "module",
   "dependencies": {
     "openai": "^5.18.1",
-    "pdfkit": "^0.15.0"
+    "pdfkit": "^0.13.0"
   }
 }
