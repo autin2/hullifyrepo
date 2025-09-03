@@ -68,7 +68,7 @@
     .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--ink)}
     .icon-pos{color:#1a7f37;font-weight:800}
     .icon-neg{color:#9c2b2e;font-weight:800}
-    .option-card .btn{margin-top:auto} /* align CTAs across the two cards */
+    .option-card .btn{margin-top:auto} /* align CTAs */
 
     /* download bar beneath results */
     #pdfBar{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
@@ -87,17 +87,8 @@
     }
 
     /* ---- Button loading state ---- */
-    .btn.is-loading{
-      opacity:.9;
-      pointer-events:none;
-      position:relative;
-    }
-    .btn.is-loading .spinner{
-      width:14px;
-      height:14px;
-      border-width:2px;
-      margin-right:8px;
-    }
+    .btn.is-loading{opacity:.9;pointer-events:none;position:relative}
+    .btn.is-loading .spinner{width:14px;height:14px;border-width:2px;margin-right:8px}
   </style>
 </head>
 <body>
@@ -451,6 +442,10 @@
   const pdfBar = document.getElementById("pdfBar");
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
   const finishSubmitBtn = document.getElementById("finishSubmitBtn");
+  const paywallModal = document.getElementById('paywallModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
+  const choosePdfBtn = document.getElementById('choosePdfBtn');
 
   let currentStep = 0;
   let pdfObjectUrl = null;
@@ -515,11 +510,6 @@
   }
 
   // ----- Paywall modal -----
-  const paywallModal = document.getElementById('paywallModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
-  const choosePdfBtn = document.getElementById('choosePdfBtn');
-
   function openModal(){
     paywallModal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -551,16 +541,15 @@
     setButtonLoading(finishSubmitBtn, false);
   });
 
-  // Close modal handlers
   document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
   closeModalBtn.addEventListener('click', closeModal);
 
-  // ---- Checkout/estimate actions (dev mode: no Stripe) ----
-  const USE_CHECKOUT = false;
+  // ---- Stripe Checkout on (set true for live/test payments) ----
+  const USE_CHECKOUT = true;
 
   chooseRevealBtn.addEventListener('click', async () => {
     if (USE_CHECKOUT){
-      window.location = '/checkout?plan=reveal_199';
+      window.location = '/api/checkout?plan=reveal_199';
       return;
     }
     setButtonLoading(chooseRevealBtn, true, "Loading estimate…");
@@ -575,7 +564,7 @@
 
   choosePdfBtn.addEventListener('click', async () => {
     if (USE_CHECKOUT){
-      window.location = '/checkout?plan=pdf_1900';
+      window.location = '/api/checkout?plan=pdf_1900';
       return;
     }
     setButtonLoading(choosePdfBtn, true, "Building PDF…");
@@ -591,7 +580,6 @@
 
   // ----- Results request -----
   async function requestEstimate(){
-    // Hide finish screen, show results-only layout
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
@@ -625,30 +613,22 @@
       `;
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (err) {
-      // On error, revert to finish screen
       document.body.classList.remove("results-only");
       document.body.classList.add("finish-only");
       finishPanel.classList.remove("hidden");
-
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
     }
   }
 
-  // ----- PDF generation (via Vercel API) -----
+  // ----- PDF generation -----
   const PDF_ENDPOINT = "/api/pdf";
-
   async function generatePdf(){
-    // clear any previous URL
-    if (pdfObjectUrl){
-      URL.revokeObjectURL(pdfObjectUrl);
-      pdfObjectUrl = null;
-    }
+    if (pdfObjectUrl){ URL.revokeObjectURL(pdfObjectUrl); pdfObjectUrl = null; }
 
     const payload = Object.fromEntries(new FormData(form).entries());
-    payload.includeTrend = true; // always include market trend in the Sell-Ready PDF
+    payload.includeTrend = true; // always include trend in Sell-Ready PDF
 
-    // Optional: hide bar during generation
     pdfBar.classList.add("hidden");
 
     try {
@@ -668,7 +648,6 @@
       const blob = await resp.blob();
       pdfObjectUrl = URL.createObjectURL(blob);
 
-      // file name from header (fallback to default)
       let fname = "Hullify-Sell-Ready-Valuation.pdf";
       const cd = resp.headers.get("content-disposition") || "";
       const m = cd.match(/filename="?([^"]+)"?/i);
@@ -685,10 +664,34 @@
     }
   }
 
-  // Clean up the blob URL if the user navigates away
+  // Clean up blob URL
   window.addEventListener("beforeunload", () => {
     if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
   });
+
+  // ----- Post-Checkout success flow -----
+  (async () => {
+    const params = new URLSearchParams(location.search);
+    if (params.get("success") === "1") {
+      const plan = params.get("plan") || "";
+      try {
+        // show estimate for both plans
+        await requestEstimate();
+        // build PDF only for the $19 plan
+        if (plan.startsWith("pdf")) {
+          await generatePdf();
+        }
+      } finally {
+        // clean the URL (keep hash if any)
+        const hash = location.hash || "";
+        history.replaceState({}, "", "estimate.html" + hash);
+      }
+    } else if (params.get("canceled") === "1") {
+      // clean URL and optionally re-open modal
+      history.replaceState({}, "", "estimate.html");
+      // openModal(); // uncomment if you want to reopen the modal automatically
+    }
+  })();
 </script>
 </body>
 </html>
