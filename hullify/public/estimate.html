@@ -328,82 +328,75 @@
 
 <noscript><div class="container" style="margin:16px auto;color:#9a2936;">JavaScript is required to use the Hullify estimate form.</div></noscript>
 
-<script>
+  <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* -------------------------- constants & storage -------------------------- */
+  /* -------------------------- ephemeral storage -------------------------- */
+  const STORAGE_KEY = "hullify:payload:v2";       // ephemeral (cleared after use)
   const PLAN_REVEAL = "reveal_199";
-  const PLAN_PDF    = "pdf_1900";
+  const PLAN_PDF = "pdf_1900";
 
-  const STORAGE_KEY       = "hullify:payload:v1";       // localStorage
-  const RETURN_INTENT_KEY = "hullify:return_intent:v1"; // sessionStorage
-  const STORAGE_TTL_MS    = 2 * 60 * 60 * 1000; // 2h
-
-  const form = document.getElementById("fullEstimateForm");
-  form.setAttribute("autocomplete","off");
-
-  function safeLS(fn, fallback=null){ try{ return fn(); } catch { return fallback; } }
-
-  function savePayload(){
+  function savePayload() {
+    const form = document.getElementById("fullEstimateForm");
     const data = Object.fromEntries(new FormData(form).entries());
-    safeLS(()=>localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data })));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data }));
   }
-  function loadSaved(){
-    return safeLS(()=>{
+  function loadSaved() {
+    try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if(!raw) return null;
+      if (!raw) return null;
       const obj = JSON.parse(raw);
-      if(!obj || !obj.data) return null;
-      if(Date.now() - (obj.t||0) > STORAGE_TTL_MS){ localStorage.removeItem(STORAGE_KEY); return null; }
-      return obj.data;
-    }, null);
+      // 24h TTL just in case user abandons flow
+      if (Date.now() - (obj.t || 0) > 24 * 3600 * 1000) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return obj.data || null;
+    } catch { return null; }
   }
-  function clearSaved(){ safeLS(()=>localStorage.removeItem(STORAGE_KEY)); }
+  function clearSaved() { localStorage.removeItem(STORAGE_KEY); }
 
-  function setReturnIntent(plan){ safeLS(()=>sessionStorage.setItem(RETURN_INTENT_KEY, JSON.stringify({ plan, t: Date.now() }))); }
-  function consumeReturnIntent(){
-    const raw = safeLS(()=>sessionStorage.getItem(RETURN_INTENT_KEY), null);
-    if(!raw) return null;
-    safeLS(()=>sessionStorage.removeItem(RETURN_INTENT_KEY));
-    try { return JSON.parse(raw); } catch { return null; }
-  }
-
-  function restoreForm(payload){
-    if(!payload) return;
-    [...form.elements].forEach(el=>{
-      if(!el.name) return;
-      const v = payload[el.name];
-      if(v === undefined) return;
-      if(el.type === "checkbox"){ el.checked = v === "yes" || v === "on" || v === true || v === "true"; }
-      else { el.value = v; }
+  function restoreForm(payload) {
+    const form = document.getElementById("fullEstimateForm");
+    if (!payload) return;
+    [...form.elements].forEach(el => {
+      if (!el.name) return;
+      if (payload[el.name] === undefined) return;
+      if (el.type === "checkbox") {
+        const v = payload[el.name];
+        el.checked = v === "yes" || v === "on" || v === true || v === "true";
+      } else {
+        el.value = payload[el.name];
+      }
     });
     updateProgress();
   }
 
   /* ------------------------------- progress ------------------------------- */
+  const form = document.getElementById("fullEstimateForm");
   const progressFill = document.getElementById("progressFill");
-  const progressPct  = document.getElementById("progressPct");
-  const completedPill= document.getElementById("completedPill");
+  const progressPct = document.getElementById("progressPct");
+  const completedPill = document.getElementById("completedPill");
   const trackable = Array.from(form.querySelectorAll("input, select, textarea"))
     .filter(el => el.name && el.type !== "hidden" && el.dataset.optional !== "true");
 
   function fieldHasValue(el){
-    if(el.tagName === "SELECT") return !!el.value;
-    if(el.type === "checkbox")  return el.checked;
-    if(el.type === "number")    return el.value !== "" && !isNaN(Number(el.value));
+    if (el.tagName === "SELECT") return !!el.value && el.value !== "";
+    if (el.type === "checkbox") return el.checked;
+    if (el.type === "number") return el.value !== "" && !isNaN(Number(el.value));
     return (el.value || "").trim().length > 0;
   }
   function updateProgress(){
     const completed = trackable.filter(fieldHasValue).length;
     const total = trackable.length || 1;
-    const pct = Math.round((completed/total)*100);
+    const pct = Math.round((completed / total) * 100);
     progressFill.style.width = pct + "%";
-    progressPct.textContent  = pct + "%";
-    completedPill.textContent= `${pct}% complete`;
+    progressPct.textContent = pct + "%";
+    completedPill.textContent = `${pct}% complete`;
     const bar = document.querySelector(".progress-bar");
-    if(bar) bar.setAttribute("aria-valuenow", String(pct));
+    if (bar) bar.setAttribute("aria-valuenow", String(pct));
   }
-  trackable.forEach(el=>["input","change","blur"].forEach(evt=>el.addEventListener(evt, updateProgress)));
+  trackable.forEach(el => ["input","change","blur"].forEach(evt => el.addEventListener(evt, updateProgress)));
   updateProgress();
 
   /* -------------------------------- wizard -------------------------------- */
@@ -413,7 +406,7 @@
   const stepIndicator = document.getElementById("stepIndicator");
   const finishPanel = document.getElementById("finishPanel");
   const editBackBtn = document.getElementById("editBackBtn");
-  const resultBox   = document.getElementById("estimateResult");
+  const resultBox = document.getElementById("estimateResult");
   let currentStep = 0;
   let lastPayload = null;
   let allowDownloadPdf = false;
@@ -425,37 +418,58 @@
     steps[i].scrollIntoView({behavior:"smooth", block:"start"});
   }
   function stepIsValid(i){
-    const req = Array.from(steps[i].querySelectorAll("[required]"));
-    for(const el of req){ if(!el.checkValidity()){ el.reportValidity(); return false; } }
+    const requiredFields = Array.from(steps[i].querySelectorAll("[required]"));
+    for (const el of requiredFields){
+      if (!el.checkValidity()){
+        el.reportValidity();
+        return false;
+      }
+    }
     return true;
   }
-  prevBtn.addEventListener("click", ()=>{ if(currentStep>0){ currentStep--; showStep(currentStep); }});
-  nextBtn.addEventListener("click", ()=>{
-    if(!stepIsValid(currentStep)) return;
-    if(currentStep < steps.length - 1){ currentStep++; showStep(currentStep); }
-    else { enterFinishOnly(); }
+  prevBtn.addEventListener("click", () => {
+    if (currentStep > 0){ currentStep--; showStep(currentStep); }
   });
-  function enterFinishOnly(){ document.body.classList.add("finish-only"); finishPanel.classList.remove("hidden"); finishPanel.scrollIntoView({behavior:"smooth", block:"center"}); }
-  function exitFinishOnly(){ document.body.classList.remove("finish-only"); currentStep = steps.length-1; showStep(currentStep); }
+  nextBtn.addEventListener("click", () => {
+    if (!stepIsValid(currentStep)) return;
+    if (currentStep < steps.length - 1){
+      currentStep++; showStep(currentStep);
+    } else {
+      enterFinishOnly();
+    }
+  });
+  function enterFinishOnly(){
+    document.body.classList.add("finish-only");
+    finishPanel.classList.remove("hidden");
+    finishPanel.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  function exitFinishOnly(){
+    document.body.classList.remove("finish-only");
+    currentStep = steps.length - 1;
+    showStep(currentStep);
+  }
   editBackBtn.addEventListener("click", exitFinishOnly);
   showStep(currentStep);
 
   /* ----------------------------- paywall modal ---------------------------- */
-  const paywallModal   = document.getElementById('paywallModal');
-  const closeModalBtn  = document.getElementById('closeModalBtn');
-  const chooseRevealBtn= document.getElementById('chooseRevealBtn');
-  const choosePdfBtn   = document.getElementById('choosePdfBtn');
+  const paywallModal = document.getElementById('paywallModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
+  const choosePdfBtn = document.getElementById('choosePdfBtn');
 
-  function openModal(){ paywallModal.classList.add('open'); document.body.style.overflow='hidden'; }
-  function closeModal(){ paywallModal.classList.remove('open'); document.body.style.overflow=''; }
+  function openModal(){ paywallModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModal(){ paywallModal.classList.remove('open'); document.body.style.overflow = ''; }
 
-  document.getElementById("finishSubmitBtn").addEventListener("click", ()=>{
-    if(!form.checkValidity()){
+  document.getElementById("finishSubmitBtn").addEventListener("click", () => {
+    if (!form.checkValidity()){
       exitFinishOnly();
       const firstInvalid = form.querySelector(":invalid");
-      if(firstInvalid){
+      if (firstInvalid){
         const stepEl = firstInvalid.closest(".wizard-step");
-        if(stepEl){ const idx = steps.indexOf(stepEl); if(idx>=0){ currentStep = idx; showStep(currentStep); } }
+        if (stepEl){
+          const idx = steps.indexOf(stepEl);
+          if (idx >= 0){ currentStep = idx; showStep(currentStep); }
+        }
         firstInvalid.reportValidity();
       }
       return;
@@ -468,9 +482,9 @@
 
   const USE_CHECKOUT = true;
 
-  chooseRevealBtn.addEventListener('click', ()=>{
-    if(USE_CHECKOUT){
-      savePayload(); setReturnIntent(PLAN_REVEAL);
+  chooseRevealBtn.addEventListener('click', () => {
+    if (USE_CHECKOUT){
+      savePayload(); // persist before redirect
       window.location = '/api/checkout?plan=' + PLAN_REVEAL;
       return;
     }
@@ -479,9 +493,9 @@
     requestEstimate(lastPayload);
   });
 
-  choosePdfBtn.addEventListener('click', ()=>{
-    if(USE_CHECKOUT){
-      savePayload(); setReturnIntent(PLAN_PDF);
+  choosePdfBtn.addEventListener('click', () => {
+    if (USE_CHECKOUT){
+      savePayload(); // persist before redirect
       window.location = '/api/checkout?plan=' + PLAN_PDF;
       return;
     }
@@ -492,9 +506,14 @@
   });
 
   /* ------------------------------ result flow ----------------------------- */
-  function showDownloadBtn(show){ const btn = document.getElementById("downloadPdfBtn"); if(btn) btn.classList.toggle("hidden", !show); }
+  function showError(msg) {
+    resultBox.classList.remove("loading");
+    resultBox.classList.remove("hidden");
+    resultBox.innerHTML = `<p class="error">${msg || "Something went wrong. Please try again."}</p>`;
+  }
 
   async function requestEstimate(payload){
+    // Reveal results layout
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
@@ -503,18 +522,23 @@
     resultBox.classList.add("loading");
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
-    try{
+    try {
+      // IMPORTANT: call your serverless function path
       const res = await fetch("/api/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload || {})
       });
-      if(!res.ok){
-        const txt = await res.text().catch(()=> "");
-        throw new Error(`Estimate ${res.status}: ${txt}`);
+
+      if (!res.ok) {
+        const t = await res.text().catch(()=> "");
+        console.error("Estimate HTTP error:", res.status, t);
+        throw new Error("Estimate failed (" + res.status + ")");
       }
+
       const data = await res.json();
 
+      // results UI
       const nameLine = `${(payload.make||"").trim()} ${(payload.model||"").trim()}`.trim();
       const metaLine = `${payload.year||"—"} • ${payload.length||"—"} ft`;
 
@@ -534,81 +558,83 @@
         </div>
       `;
 
-      // we no longer need saved payload once results are shown
+      // Clear ephemeral saved payload after successful render
       clearSaved();
 
+      // wire download button
       const dl = document.getElementById("downloadPdfBtn");
-      if(dl){
-        dl.onclick = async ()=>{
+      if (dl){
+        dl.onclick = async () => {
           dl.disabled = true;
           const prev = dl.textContent;
           dl.textContent = "Preparing PDF…";
-          try{
+          try {
             const pdfRes = await fetch("/api/pdf", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ ...(lastPayload||payload||{}), includeTrend: true })
             });
-            if(!pdfRes.ok){
-              const t = await pdfRes.text().catch(()=> "");
-              throw new Error(`PDF ${pdfRes.status}: ${t}`);
-            }
+            if (!pdfRes.ok) throw new Error("PDF failed: " + pdfRes.status);
             const blob = await pdfRes.blob();
-            const url  = URL.createObjectURL(blob);
+            const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            a.download = `Hullify_Valuation_${(payload.make||"Boat").replace(/\s+/g,"_").slice(0,32)}_${payload.year||""}.pdf`;
-            document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-          } catch(e){ alert("Could not download PDF. Please try again."); }
-          finally{ dl.disabled = false; dl.textContent = prev; }
+            const fname = `Hullify_Valuation_${(payload.make||"Boat").replace(/\s+/g,"_").slice(0,32)}_${payload.year||""}.pdf`;
+            a.download = fname;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          } catch (e) {
+            alert("Could not download PDF. Please try again.");
+          } finally {
+            dl.disabled = false;
+            dl.textContent = prev;
+          }
         };
       }
 
-      resultBox.scrollIntoView({ behavior:"smooth", block:"center" });
-    } catch(err){
+      resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (err) {
       console.error(err);
       document.body.classList.remove("results-only");
       document.body.classList.add("finish-only");
       finishPanel.classList.remove("hidden");
-      resultBox.classList.remove("loading");
-      resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
+      showError("Something went wrong. Please try again.");
     }
   }
 
   // Edit details from results
-  document.addEventListener("click", (e)=>{
-    const link = e.target.closest('a#editDetailsLink'); if(!link) return;
-    e.preventDefault(); document.body.classList.remove("results-only");
-    currentStep = steps.length - 1; showStep(currentStep);
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a#editDetailsLink');
+    if (!link) return;
+    e.preventDefault();
+    document.body.classList.remove("results-only");
+    currentStep = steps.length - 1;
+    showStep(currentStep);
     document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
 
-  /* --------------------------- bootstrap (return) --------------------------- */
-  (function bootstrap(){
-    form.querySelectorAll("input, select, textarea").forEach(el=>el.setAttribute("autocomplete","off"));
-
-    const params  = new URLSearchParams(location.search);
+  /* --------------------- restore after Stripe redirect --------------------- */
+  (function bootstrapFromQuery(){
+    const params = new URLSearchParams(location.search);
     const success = params.get("success") === "1";
-    const planQP  = params.get("plan");
-    const intent  = success ? null : consumeReturnIntent();
-    const plan    = (planQP || (intent && intent.plan)) || null;
+    const plan = params.get("plan");
+    const saved = loadSaved();
 
-    const saved   = loadSaved();
+    if (saved) restoreForm(saved);
 
-    if ((success || intent) && saved){
-      restoreForm(saved);
+    if (success && saved) {
       lastPayload = saved;
       allowDownloadPdf = (plan === PLAN_PDF);
-      history.replaceState(null, "", location.pathname); // clean URL
       requestEstimate(saved);
-      return;
+      // Clean URL
+      history.replaceState(null, "", location.pathname);
     }
-
-    // fresh visit
-    form.reset();
-    form.querySelectorAll("input, select, textarea").forEach(el=>{ if(el.type==="checkbox") el.checked=false; else el.value=""; });
-    updateProgress();
   })();
 </script>
+
+
+  
 </body>
 </html>
