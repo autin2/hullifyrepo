@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Hullify — Detailed Estimate</title>
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- Page-local helpers for the wizard + finish/results views -->
+  <style>
+    .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
+    .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
+    .section-title{margin:0 0 8px;color:var(--primary);font-size:16px}
+    .wizard-step{display:none}
+    .wizard-step.active{display:block}
+    .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    @media (max-width:900px){.row-2,.row-3{grid-template-columns:1fr}}
+    .wizard-nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:8px}
+    .left-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .right-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .hidden{display:none!important}
+    .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
+    /* Standalone finish panel */
+    #finishPanel{display:none}
+    .finish-only #finishPanel{display:block}
+    .finish-panel{
+      max-width:760px;margin:28px auto 0;
+      border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;
+      background:
+        radial-gradient(800px 160px at 50% -40px, #cfe2ff 0%, transparent 60%),
+        linear-gradient(180deg,#fff 0%, #f7fbff 100%);
+      box-shadow:0 10px 30px rgba(0,0,0,.06);
+    }
+    .finish-panel h3{margin:0 0 6px;color:var(--primary);font-size:22px}
+    .finish-panel .muted{margin:0 0 16px}
+    .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+    .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
+    /* Finish-only hides wizard+progress for a clean screen */
+    .finish-only .card.big, .finish-only .progress-wrap{display:none}
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div class="container nav">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <span>Hullify</span>
+    </div>
+    <nav class="nav-links">
+      <a href="index.html">Home</a>
+      <a href="estimate.html" class="active">Estimate</a>
+    </nav>
+    <a class="btn btn-primary small" href="#estimate-form">Get estimate</a>
+  </div>
+</header>
+
+<main class="estimate-page">
+  <section class="container" id="estimate-form">
+    <div class="page-header">
+      <h1>Tell us about your boat</h1>
+      <p class="muted">More details = more accurate estimate. Takes ~1–2 minutes.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Progress</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div id="stepIndicator" class="step-indicator">Step 1 of 5 • Boat basics</div>
+    </div>
+
+    <div class="card big">
+      <form id="fullEstimateForm" class="stack">
+        <!-- 1) Boat basics -->
+        <div class="form-section wizard-step active" data-step="1">
+          <h3 class="section-title">Boat basics</h3>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="make">Make</label>
+              <input id="make" type="text" name="make" placeholder="e.g., Boston Whaler" required />
+            </div>
+            <div class="stack">
+              <label class="label" for="model">Model</label>
+              <input id="model" type="text" name="model" placeholder="e.g., 210 Outrage" required />
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="year">Year</label>
+              <input id="year" type="number" name="year" placeholder="e.g., 2018" min="1950" max="2035" required />
+            </div>
+            <div class="stack">
+              <label class="label" for="length">Length (ft)</label>
+              <input id="length" type="number" name="length" placeholder="e.g., 23" min="8" max="200" step="0.1" required />
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="vesselClass">Class</label>
+              <select id="vesselClass" name="vesselClass">
+                <option value="" disabled selected>Select class</option>
+                <option>Center Console</option>
+                <option>Dual Console</option>
+                <option>Walkaround</option>
+                <option>Cuddy Cabin</option>
+                <option>Bowrider</option>
+                <option>Deck Boat</option>
+                <option>Bay Boat</option>
+                <option>Jon Boat</option>
+                <option>Pontoon</option>
+                <option>Cabin Cruiser</option>
+                <option>Sportfisher / Convertible</option>
+                <option>Express Cruiser</option>
+                <option>Trawler</option>
+                <option>Sailboat</option>
+                <option>RIB / Inflatable</option>
+                <option>Jet Boat</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div class="stack">
+              <label class="label" for="hullMaterial">Hull material</label>
+              <select id="hullMaterial" name="hullMaterial">
+                <option value="" disabled selected>Select hull material</option>
+                <option>Fiberglass</option>
+                <option>Aluminum</option>
+                <option>Wood</option>
+                <option>Steel</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2) Condition & usage -->
+        <div class="form-section wizard-step" data-step="2">
+          <h3 class="section-title">Condition &amp; usage</h3>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="condition">Overall condition</label>
+              <select id="condition" name="condition" required>
+                <option value="" disabled selected>Select condition</option>
+                <option>Excellent</option>
+                <option>Good</option>
+                <option>Fair</option>
+                <option>Needs Work</option>
+              </select>
+            </div>
+            <div class="stack">
+              <label class="label" for="runs">Does it run?</label>
+              <select id="runs" name="runs" required>
+                <option value="" disabled selected>Select</option>
+                <option>Yes</option>
+                <option>Starts but stalls</option>
+                <option>No</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="engineHours">Engine hours (approx.)</label>
+              <input id="engineHours" type="number" name="engineHours" placeholder="e.g., 520" min="0" />
+            </div>
+            <div class="stack" style="align-self:end">
+              <label class="label" for="outOfWaterYearPlus">Storage</label>
+              <label class="checkbox-field">
+                <input id="outOfWaterYearPlus" type="checkbox" name="outOfWaterYearPlus" value="yes" data-optional="true" />
+                <span>Out of the water for at least 1 year?</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3) Engine & fuel -->
+        <div class="form-section wizard-step" data-step="3">
+          <h3 class="section-title">Engine &amp; fuel</h3>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="engine">Engine model</label>
+              <input id="engine" type="text" name="engine" placeholder="e.g., Yamaha F300 / MerCruiser 5.7 MPI" />
+            </div>
+            <div class="stack">
+              <label class="label" for="engineCount"># of engines</label>
+              <select id="engineCount" name="engineCount">
+                <option value="" disabled selected>Select count</option>
+                <option>1</option><option>2</option><option>3</option><option>4+</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="row-2">
+            <div class="stack">
+              <label class="label" for="fuelType">Fuel type</label>
+              <select id="fuelType" name="fuelType">
+                <option value="" disabled selected>Select fuel</option>
+                <option>Gasoline</option>
+                <option>Diesel</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 4) Ownership & location -->
+        <div class="form-section wizard-step" data-step="4">
+          <h3 class="section-title">Ownership &amp; location</h3>
+
+          <div class="row-3">
+            <div class="stack">
+              <label class="label" for="location">ZIP/City, State</label>
+              <input id="location" type="text" name="location" placeholder="e.g., 32210, Jacksonville FL" />
+            </div>
+            <div class="stack">
+              <label class="label" for="trailer">Trailer included?</label>
+              <select id="trailer" name="trailer">
+                <option value="" disabled selected>Select</option>
+                <option>Yes</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div class="stack">
+              <label class="label" for="titleStatus">Title status</label>
+              <select id="titleStatus" name="titleStatus">
+                <option value="" disabled selected>Select</option>
+                <option>Clean</option>
+                <option>Loan/Lien</option>
+                <option>Bill of Sale only</option>
+                <option>Other</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5) Notes (optional) -->
+        <div class="form-section wizard-step" data-step="5">
+          <h3 class="section-title">Notes (optional)</h3>
+
+          <div class="stack">
+            <label class="label" for="details">Important Details</label>
+            <textarea id="details" name="details" rows="5" placeholder='e.g., "Soft spot near bow hatch"' data-optional="true"></textarea>
+            <p class="fine">Add anything that could impact value: electronics issues, soft decks, recent maintenance, trailer condition, upholstery, etc.</p>
+          </div>
+
+          <div class="stack">
+            <label class="label" for="aftermarket">Aftermarket Additions</label>
+            <textarea id="aftermarket" name="aftermarket" rows="5" placeholder='e.g., "Bose audio upgrade"' data-optional="true"></textarea>
+            <p class="fine">Upgrades or mods that might add value (audio, lighting, electronics, canvas/T-top, flooring, paint/graphics, etc.).</p>
+          </div>
+        </div>
+
+        <!-- Wizard nav -->
+        <div class="wizard-nav">
+          <div class="left-actions">
+            <button id="prevBtn" type="button" class="btn btn-ghost">Back</button>
+          </div>
+          <div class="right-actions">
+            <a class="btn btn-ghost" href="index.html">Back to Home</a>
+            <button id="nextBtn" type="button" class="btn btn-primary">Next</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <!-- Standalone FINISH panel -->
+    <div id="finishPanel" class="finish-panel">
+      <h3>Ready to get your estimate?</h3>
+      <p class="muted">We’ll analyze your details against recent sales and market trends.</p>
+      <div style="margin:6px 0 16px;">
+        <span class="pill" id="completedPill">0% complete</span>
+      </div>
+      <div class="finish-actions">
+        <button id="finishSubmitBtn" class="btn btn-primary">Get estimate</button>
+        <button id="editBackBtn" class="btn btn-ghost">Keep editing</button>
+      </div>
+    </div>
+
+    <!-- RESULT -->
+    <div id="estimateResult" class="result hidden" style="margin-top:18px;"></div>
+  </section>
+</main>
+
+<!-- Paywall Modal -->
+<div id="paywallModal" class="modal" aria-hidden="true">
+  <div class="modal-backdrop"></div>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="paywallTitle">
+    <div class="modal-head">
+      <h3 id="paywallTitle" class="modal-title">Choose your report</h3>
+      <button id="closeModalBtn" class="modal-close" aria-label="Close">×</button>
+    </div>
+
+    <div class="option-grid">
+      <!-- Reveal Estimate -->
+      <div class="option-card">
+        <div class="badge">Most affordable</div>
+        <h4>Reveal Estimate</h4>
+        <p class="sub">Instant value, range, and confidence on this page.</p>
+        <div class="price">$1.99</div>
+        <ul class="feature-list">
+          <li><span class="icon-pos">✓</span><span>Instant reveal on this page</span></li>
+          <li><span class="icon-pos">✓</span><span>Value, range &amp; confidence score</span></li>
+          <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
+          <li><span class="icon-neg">–</span><span>No market trend chart</span></li>
+        </ul>
+        <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+      </div>
+
+      <!-- Sell-Ready PDF -->
+      <div class="option-card">
+        <div class="badge">Best for selling</div>
+        <h4>Sell-Ready PDF</h4>
+        <p class="sub">Branded report to attach to your listing.</p>
+        <div class="price" id="pdfPriceText">$19</div>
+
+        <div class="addon-row">
+          <label for="trendAddon">Add Market Trend Chart <span class="muted">(+$20)</span></label>
+          <label class="switch">
+            <input type="checkbox" id="trendAddon" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <ul class="feature-list">
+          <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
+          <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
+          <li><span class="icon-pos">✓</span><span>Listing title/description template</span></li>
+          <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
+          <li><span class="icon-pos">✓</span><span>Optional Market Trend Chart when toggled</span></li>
+        </ul>
+        <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div>© <span id="year"></span> Hullify</div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="estimate.html">Estimate</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // ----- Progress bar (ignore data-optional="true") -----
+  const form = document.getElementById("fullEstimateForm");
+  const progressFill = document.getElementById("progressFill");
+  const progressPct = document.getElementById("progressPct");
+  const completedPill = document.getElementById("completedPill");
+
+  const trackable = Array.from(form.querySelectorAll("input, select, textarea"))
+    .filter(el => el.name && el.type !== "hidden" && el.dataset.optional !== "true");
+
+  function fieldHasValue(el){
+    if (el.tagName === "SELECT") return !!el.value && el.value !== "";
+    if (el.type === "checkbox") return el.checked;
+    if (el.type === "number") return el.value !== "" && !isNaN(Number(el.value));
+    return (el.value || "").trim().length > 0;
+  }
+  function updateProgress(){
+    const completed = trackable.filter(fieldHasValue).length;
+    const total = trackable.length || 1;
+    const pct = Math.round((completed / total) * 100);
+    progressFill.style.width = pct + "%";
+    progressPct.textContent = pct + "%";
+    completedPill.textContent = `${pct}% complete`;
+  }
+  trackable.forEach(el => ["input","change","blur"].forEach(evt => el.addEventListener(evt, updateProgress)));
+  updateProgress();
+
+  // ----- Wizard behavior (5 steps) -----
+  const steps = Array.from(document.querySelectorAll(".wizard-step"));
+  const prevBtn = document.getElementById("prevBtn");
+  const nextBtn = document.getElementById("nextBtn");
+  const stepIndicator = document.getElementById("stepIndicator");
+  const finishPanel = document.getElementById("finishPanel");
+  const editBackBtn = document.getElementById("editBackBtn");
+  const resultBox = document.getElementById("estimateResult");
+  let currentStep = 0;
+
+  function showStep(i){
+    steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
+    prevBtn.disabled = (i===0);
+    stepIndicator.textContent = `Step ${i+1} of ${steps.length} • ${steps[i].querySelector(".section-title").textContent}`;
+    steps[i].scrollIntoView({behavior:"smooth", block:"start"});
+  }
+
+  function stepIsValid(i){
+    const requiredFields = Array.from(steps[i].querySelectorAll("[required]"));
+    for (const el of requiredFields){
+      if (!el.checkValidity()){
+        el.reportValidity();
+        return false;
+      }
+    }
+    return true;
+  }
+
+  prevBtn.addEventListener("click", () => {
+    if (currentStep > 0){ currentStep--; showStep(currentStep); }
+  });
+
+  nextBtn.addEventListener("click", () => {
+    if (!stepIsValid(currentStep)) return;
+    if (currentStep < steps.length - 1){
+      currentStep++; showStep(currentStep);
+    } else {
+      enterFinishOnly();
+    }
+  });
+
+  function enterFinishOnly(){
+    document.body.classList.add("finish-only");
+    finishPanel.classList.remove("hidden");
+    finishPanel.scrollIntoView({behavior:"smooth", block:"center"});
+  }
+  function exitFinishOnly(){
+    document.body.classList.remove("finish-only");
+    currentStep = steps.length - 1;
+    showStep(currentStep);
+  }
+  editBackBtn.addEventListener("click", exitFinishOnly);
+  showStep(currentStep);
+
+  // ----- Paywall modal -----
+  const paywallModal = document.getElementById('paywallModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
+  const choosePdfBtn = document.getElementById('choosePdfBtn');
+  const trendAddon = document.getElementById('trendAddon');
+  const pdfPriceText = document.getElementById('pdfPriceText');
+
+  function openModal(){
+    paywallModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal(){
+    paywallModal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // price toggle for PDF card
+  function updatePdfCta(){
+    const plus = trendAddon.checked;
+    pdfPriceText.textContent = plus ? '$39' : '$19';
+    choosePdfBtn.textContent = plus ? 'Get PDF + Trend Chart for $39' : 'Get PDF for $19';
+  }
+  trendAddon.addEventListener('change', updatePdfCta);
+  updatePdfCta();
+
+  // Intercept "Get estimate" -> show modal
+  document.getElementById("finishSubmitBtn").addEventListener("click", () => {
+    if (!form.checkValidity()){
+      exitFinishOnly();
+      const firstInvalid = form.querySelector(":invalid");
+      if (firstInvalid){
+        const stepEl = firstInvalid.closest(".wizard-step");
+        if (stepEl){
+          const idx = steps.indexOf(stepEl);
+          if (idx >= 0){ currentStep = idx; showStep(currentStep); }
+        }
+        firstInvalid.reportValidity();
+      }
+      return;
+    }
+    openModal();
+  });
+
+  // Close modal handlers
+  document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
+  closeModalBtn.addEventListener('click', closeModal);
+
+  // ---- Checkout/estimate actions ----
+  const USE_CHECKOUT = false; // set to true when you wire Stripe
+
+  chooseRevealBtn.addEventListener('click', () => {
+    if (USE_CHECKOUT){
+      window.location = '/checkout?plan=reveal_199';
+      return;
+    }
+    closeModal();
+    requestEstimate(); // proceed without checkout (dev mode)
+  });
+
+  choosePdfBtn.addEventListener('click', () => {
+    if (USE_CHECKOUT){
+      const plan = trendAddon.checked ? 'pdf_plus_3900' : 'pdf_1900';
+      window.location = `/checkout?plan=${plan}`;
+      return;
+    }
+    closeModal();
+    requestEstimate(); // proceed without checkout (dev mode)
+  });
+
+  // ----- Results-only request flow -----
+  async function requestEstimate(){
+    // Hide finish screen, show results-only layout
+    finishPanel.classList.add("hidden");
+    document.body.classList.remove("finish-only");
+    document.body.classList.add("results-only");
+
+    resultBox.classList.remove("hidden");
+    resultBox.classList.add("loading");
+    resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
+
+    const payload = Object.fromEntries(new FormData(form).entries());
+
+    try {
+      const res = await fetch("/estimate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json();
+
+      resultBox.classList.remove("loading");
+      resultBox.innerHTML = `
+        <div class="estimate-result">
+          <h3>Your Estimated Value</h3>
+          <p class="muted">
+            ${(payload.make||"").trim()} ${(payload.model||"").trim()} • ${payload.year||"—"} • ${payload.length||"—"} ft
+          </p>
+          <div class="estimate-pill">${data.estimate || "$—"}</div>
+          ${data.range ? `<p class="fine">Range: ${data.range.low || "$—"} – ${data.range.high || "$—"}</p>` : ""}
+          ${data.confidence ? `<p class="fine">Confidence: ${data.confidence}</p>` : ""}
+          ${data.rationale ? `<p class="fine">Why: ${data.rationale}</p>` : ""}
+          <div class="actions">
+            <a class="btn btn-primary" href="index.html#reviews">See reviews</a>
+            <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
+          </div>
+        </div>
+      `;
+      resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (err) {
+      // On error, revert to finish screen
+      document.body.classList.remove("results-only");
+      document.body.classList.add("finish-only");
+      finishPanel.classList.remove("hidden");
+
+      resultBox.classList.remove("loading");
+      resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
+    }
+  }
+
+  // Edit details from results
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a#editDetailsLink');
+    if (!link) return;
+    e.preventDefault();
+    document.body.classList.remove("results-only");
+    currentStep = steps.length - 1;
+    showStep(currentStep);
+    document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
+  });
+</script>
+</body>
+</html>
