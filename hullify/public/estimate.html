@@ -560,7 +560,7 @@
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
     try {
-      const res = await fetch("/estimate", {
+      const res = await fetch("/api/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload || {})
