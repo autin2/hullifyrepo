@@ -1,52 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Basic SEO -->
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hullify — Boat Value Estimate Tool (Fast & Accurate)</title>
-  <meta name="description" content="Get a fast, accurate boat value estimate with Hullify. Enter make, model, year, condition, and more to see your boat’s market value, range, and confidence. Optional sell-ready PDF.">
-  <link rel="canonical" href="https://your-domain.com/estimate.html">
-  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1">
-  <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
-  <meta http-equiv="Pragma" content="no-cache">
-
-  <!-- Open Graph / Twitter -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Hullify — Boat Value Estimate Tool (Fast & Accurate)">
-  <meta property="og:description" content="Answer a few questions and get your boat’s value, range, and confidence score. Optional sell-ready PDF report.">
-  <meta property="og:url" content="https://your-domain.com/estimate.html">
-  <meta property="og:image" content="https://your-domain.com/img/og-hullify.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Hullify — Boat Value Estimate Tool">
-  <meta name="twitter:description" content="Fast, accurate boat valuation with optional sell-ready PDF.">
-  <meta name="twitter:image" content="https://your-domain.com/img/og-hullify.png">
-
-  <link rel="preload" href="style.css" as="style">
+  <title>Hullify — Detailed Estimate</title>
   <link rel="stylesheet" href="style.css"/>
 
+  <!-- Page-local helpers for the wizard + finish/results views -->
   <style>
     .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
     .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
     .section-title{margin:0 0 8px;color:var(--primary);font-size:16px}
-    .wizard-step{display:none}.wizard-step.active{display:block}
+    .wizard-step{display:none}
+    .wizard-step.active{display:block}
     .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     @media (max-width:900px){.row-2,.row-3{grid-template-columns:1fr}}
     .wizard-nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:8px}
-    .left-actions,.right-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .left-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
-    #finishPanel{display:none}.finish-only #finishPanel{display:block}
-    .finish-panel{max-width:760px;margin:28px auto 0;border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;background:radial-gradient(800px 160px at 50% -40px,#cfe2ff 0,transparent 60%),linear-gradient(180deg,#fff 0,#f7fbff 100%);box-shadow:0 10px 30px rgba(0,0,0,.06)}
+    #finishPanel{display:none}
+    .finish-only #finishPanel{display:block}
+    .finish-panel{
+      max-width:760px;margin:28px auto 0;
+      border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;
+      background:
+        radial-gradient(800px 160px at 50% -40px, #cfe2ff 0%, transparent 60%),
+        linear-gradient(180deg,#fff 0%, #f7fbff 100%);
+      box-shadow:0 10px 30px rgba(0,0,0,.06);
+    }
     .finish-panel h3{margin:0 0 6px;color:var(--primary);font-size:22px}
     .finish-panel .muted{margin:0 0 16px}
     .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
-    .finish-only .card.big,.finish-only .progress-wrap{display:none}
-    .modal{position:fixed;inset:0;display:none}.modal.open{display:block}
+    .finish-only .card.big, .finish-only .progress-wrap{display:none}
+
+    /* Paywall modal (from earlier steps) */
+    .modal{position:fixed;inset:0;display:none}
+    .modal.open{display:block}
     .modal-backdrop{position:absolute;inset:0;background:rgba(6,22,41,.55)}
-    .modal-box{position:relative;z-index:2;max-width:900px;margin:60px auto;background:#fff;border-radius:16px;border:1px solid var(--border);padding:18px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+    .modal-box{
+      position:relative;z-index:2;max-width:900px;margin:60px auto;background:#fff;border-radius:16px;
+      border:1px solid var(--border);padding:18px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)
+    }
     .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
     .modal-title{margin:0;color:var(--primary)}
     .modal-close{border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer}
@@ -58,36 +56,27 @@
     .option-card .price{font-weight:800;color:var(--primary);font-size:22px;margin:6px 0 10px}
     .feature-list{list-style:none;padding:0;margin:0 0 12px}
     .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--muted)}
-    .icon-pos{color:#067642;font-weight:900}.icon-neg{color:#9a2936;font-weight:900}
+    .icon-pos{color:#067642;font-weight:900}
+    .icon-neg{color:#9a2936;font-weight:900}
     .get-btn-wrap{display:flex;align-items:flex-end;justify-content:center;margin-top:14px}
   </style>
-
-  <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context":"https://schema.org",
-    "@graph":[
-      {"@type":"Organization","name":"Hullify","url":"https://your-domain.com","logo":"https://your-domain.com/img/logo.png"},
-      {"@type":"WebSite","name":"Hullify","url":"https://your-domain.com",
-        "potentialAction":{"@type":"SearchAction","target":"https://your-domain.com/search?q={query}","query-input":"required name=query"}},
-      {"@type":"WebPage","name":"Boat Value Estimate","url":"https://your-domain.com/estimate.html","description":"Fast, accurate boat value estimates with optional sell-ready PDF report."}
-    ]
-  }
-  </script>
 </head>
 <body>
-<header class="site-header" role="banner">
+<header class="site-header">
   <div class="container nav">
-    <div class="brand" aria-label="Hullify"><span class="logo-dot" aria-hidden="true"></span><span>Hullify</span></div>
-    <nav class="nav-links" aria-label="Primary">
+    <div class="brand">
+      <span class="logo-dot"></span>
+      <span>Hullify</span>
+    </div>
+    <nav class="nav-links">
       <a href="index.html">Home</a>
-      <a href="estimate.html" class="active" aria-current="page">Estimate</a>
+      <a href="estimate.html" class="active">Estimate</a>
     </nav>
     <a class="btn btn-primary small" href="#estimate-form">Get estimate</a>
   </div>
 </header>
 
-<main class="estimate-page" id="main">
+<main class="estimate-page">
   <section class="container" id="estimate-form">
     <div class="page-header">
       <h1>Tell us about your boat</h1>
@@ -95,56 +84,78 @@
     </div>
 
     <!-- Progress -->
-    <div class="progress-wrap" aria-live="polite">
-      <div class="progress-meta"><span>Progress</span><span id="progressPct">0%</span></div>
-      <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+    <div class="progress-wrap">
+      <div class="progress-meta">
+        <span>Progress</span>
+        <span id="progressPct">0%</span>
+      </div>
+      <div class="progress-bar">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
       <div id="stepIndicator" class="step-indicator">Step 1 of 5 • Boat basics</div>
     </div>
 
     <div class="card big">
-      <form id="fullEstimateForm" class="stack" autocomplete="off" novalidate>
+      <form id="fullEstimateForm" class="stack">
         <!-- 1) Boat basics -->
         <div class="form-section wizard-step active" data-step="1">
-          <h2 class="section-title">Boat basics</h2>
+          <h3 class="section-title">Boat basics</h3>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="make">Make</label>
-              <input id="make" type="text" name="make" placeholder="e.g., Boston Whaler" required autocomplete="off"/>
+              <input id="make" type="text" name="make" placeholder="e.g., Boston Whaler" required />
             </div>
             <div class="stack">
               <label class="label" for="model">Model</label>
-              <input id="model" type="text" name="model" placeholder="e.g., 210 Outrage" required autocomplete="off"/>
+              <input id="model" type="text" name="model" placeholder="e.g., 210 Outrage" required />
             </div>
           </div>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="year">Year</label>
-              <input id="year" type="number" name="year" placeholder="e.g., 2018" min="1950" max="2035" required autocomplete="off" inputmode="numeric"/>
+              <input id="year" type="number" name="year" placeholder="e.g., 2018" min="1950" max="2035" required />
             </div>
             <div class="stack">
               <label class="label" for="length">Length (ft)</label>
-              <input id="length" type="number" name="length" placeholder="e.g., 23" min="8" max="200" step="0.1" required autocomplete="off" inputmode="decimal"/>
+              <input id="length" type="number" name="length" placeholder="e.g., 23" min="8" max="200" step="0.1" required />
             </div>
           </div>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="vesselClass">Class</label>
-              <select id="vesselClass" name="vesselClass" autocomplete="off">
+              <select id="vesselClass" name="vesselClass">
                 <option value="" disabled selected>Select class</option>
-                <option>Center Console</option><option>Dual Console</option><option>Walkaround</option>
-                <option>Cuddy Cabin</option><option>Bowrider</option><option>Deck Boat</option><option>Bay Boat</option>
-                <option>Jon Boat</option><option>Pontoon</option><option>Cabin Cruiser</option><option>Sportfisher / Convertible</option>
-                <option>Express Cruiser</option><option>Trawler</option><option>Sailboat</option><option>RIB / Inflatable</option>
-                <option>Jet Boat</option><option>Other</option>
+                <option>Center Console</option>
+                <option>Dual Console</option>
+                <option>Walkaround</option>
+                <option>Cuddy Cabin</option>
+                <option>Bowrider</option>
+                <option>Deck Boat</option>
+                <option>Bay Boat</option>
+                <option>Jon Boat</option>
+                <option>Pontoon</option>
+                <option>Cabin Cruiser</option>
+                <option>Sportfisher / Convertible</option>
+                <option>Express Cruiser</option>
+                <option>Trawler</option>
+                <option>Sailboat</option>
+                <option>RIB / Inflatable</option>
+                <option>Jet Boat</option>
+                <option>Other</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="hullMaterial">Hull material</label>
-              <select id="hullMaterial" name="hullMaterial" autocomplete="off">
+              <select id="hullMaterial" name="hullMaterial">
                 <option value="" disabled selected>Select hull material</option>
-                <option>Fiberglass</option><option>Aluminum</option><option>Wood</option><option>Steel</option><option>Other</option>
+                <option>Fiberglass</option>
+                <option>Aluminum</option>
+                <option>Wood</option>
+                <option>Steel</option>
+                <option>Other</option>
               </select>
             </div>
           </div>
@@ -152,32 +163,39 @@
 
         <!-- 2) Condition & usage -->
         <div class="form-section wizard-step" data-step="2">
-          <h2 class="section-title">Condition &amp; usage</h2>
+          <h3 class="section-title">Condition &amp; usage</h3>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="condition">Overall condition</label>
-              <select id="condition" name="condition" required autocomplete="off">
+              <select id="condition" name="condition" required>
                 <option value="" disabled selected>Select condition</option>
-                <option>Excellent</option><option>Good</option><option>Fair</option><option>Needs Work</option>
+                <option>Excellent</option>
+                <option>Good</option>
+                <option>Fair</option>
+                <option>Needs Work</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="runs">Does it run?</label>
-              <select id="runs" name="runs" required autocomplete="off">
+              <select id="runs" name="runs" required>
                 <option value="" disabled selected>Select</option>
-                <option>Yes</option><option>Starts but stalls</option><option>No</option>
+                <option>Yes</option>
+                <option>Starts but stalls</option>
+                <option>No</option>
               </select>
             </div>
           </div>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="engineHours">Engine hours (approx.)</label>
-              <input id="engineHours" type="number" name="engineHours" placeholder="e.g., 520" min="0" autocomplete="off" inputmode="numeric"/>
+              <input id="engineHours" type="number" name="engineHours" placeholder="e.g., 520" min="0" />
             </div>
             <div class="stack" style="align-self:end">
-              <span class="label">Storage</span>
+              <label class="label" for="outOfWaterYearPlus">Storage</label>
               <label class="checkbox-field">
-                <input id="outOfWaterYearPlus" type="checkbox" name="outOfWaterYearPlus" value="yes" data-optional="true"/>
+                <input id="outOfWaterYearPlus" type="checkbox" name="outOfWaterYearPlus" value="yes" data-optional="true" />
                 <span>Out of the water for at least 1 year?</span>
               </label>
             </div>
@@ -186,26 +204,29 @@
 
         <!-- 3) Engine & fuel -->
         <div class="form-section wizard-step" data-step="3">
-          <h2 class="section-title">Engine &amp; fuel</h2>
+          <h3 class="section-title">Engine &amp; fuel</h3>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="engine">Engine model</label>
-              <input id="engine" type="text" name="engine" placeholder="e.g., Yamaha F300 / MerCruiser 5.7 MPI" autocomplete="off"/>
+              <input id="engine" type="text" name="engine" placeholder="e.g., Yamaha F300 / MerCruiser 5.7 MPI" />
             </div>
             <div class="stack">
               <label class="label" for="engineCount"># of engines</label>
-              <select id="engineCount" name="engineCount" autocomplete="off">
+              <select id="engineCount" name="engineCount">
                 <option value="" disabled selected>Select count</option>
                 <option>1</option><option>2</option><option>3</option><option>4+</option>
               </select>
             </div>
           </div>
+
           <div class="row-2">
             <div class="stack">
               <label class="label" for="fuelType">Fuel type</label>
-              <select id="fuelType" name="fuelType" autocomplete="off">
+              <select id="fuelType" name="fuelType">
                 <option value="" disabled selected>Select fuel</option>
-                <option>Gasoline</option><option>Diesel</option>
+                <option>Gasoline</option>
+                <option>Diesel</option>
               </select>
             </div>
           </div>
@@ -213,24 +234,29 @@
 
         <!-- 4) Ownership & location -->
         <div class="form-section wizard-step" data-step="4">
-          <h2 class="section-title">Ownership &amp; location</h2>
+          <h3 class="section-title">Ownership &amp; location</h3>
+
           <div class="row-3">
             <div class="stack">
               <label class="label" for="location">ZIP/City, State</label>
-              <input id="location" type="text" name="location" placeholder="e.g., 32210, Jacksonville FL" autocomplete="off"/>
+              <input id="location" type="text" name="location" placeholder="e.g., 32210, Jacksonville FL" />
             </div>
             <div class="stack">
               <label class="label" for="trailer">Trailer included?</label>
-              <select id="trailer" name="trailer" autocomplete="off">
+              <select id="trailer" name="trailer">
                 <option value="" disabled selected>Select</option>
-                <option>Yes</option><option>No</option>
+                <option>Yes</option>
+                <option>No</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="titleStatus">Title status</label>
-              <select id="titleStatus" name="titleStatus" autocomplete="off">
+              <select id="titleStatus" name="titleStatus">
                 <option value="" disabled selected>Select</option>
-                <option>Clean</option><option>Loan/Lien</option><option>Bill of Sale only</option><option>Other</option>
+                <option>Clean</option>
+                <option>Loan/Lien</option>
+                <option>Bill of Sale only</option>
+                <option>Other</option>
               </select>
             </div>
           </div>
@@ -238,22 +264,26 @@
 
         <!-- 5) Notes (optional) -->
         <div class="form-section wizard-step" data-step="5">
-          <h2 class="section-title">Notes (optional)</h2>
+          <h3 class="section-title">Notes (optional)</h3>
+
           <div class="stack">
             <label class="label" for="details">Important Details</label>
-            <textarea id="details" name="details" rows="5" placeholder='e.g., "Soft spot near bow hatch"' data-optional="true" autocomplete="off"></textarea>
+            <textarea id="details" name="details" rows="5" placeholder='e.g., "Soft spot near bow hatch"' data-optional="true"></textarea>
             <p class="fine">Add anything that could impact value: electronics issues, soft decks, recent maintenance, trailer condition, upholstery, etc.</p>
           </div>
+
           <div class="stack">
             <label class="label" for="aftermarket">Aftermarket Additions</label>
-            <textarea id="aftermarket" name="aftermarket" rows="5" placeholder='e.g., "Bose audio upgrade"' data-optional="true" autocomplete="off"></textarea>
+            <textarea id="aftermarket" name="aftermarket" rows="5" placeholder='e.g., "Bose audio upgrade"' data-optional="true"></textarea>
             <p class="fine">Upgrades or mods that might add value (audio, lighting, electronics, canvas/T-top, flooring, paint/graphics, etc.).</p>
           </div>
         </div>
 
         <!-- Wizard nav -->
         <div class="wizard-nav">
-          <div class="left-actions"><button id="prevBtn" type="button" class="btn btn-ghost">Back</button></div>
+          <div class="left-actions">
+            <button id="prevBtn" type="button" class="btn btn-ghost">Back</button>
+          </div>
           <div class="right-actions">
             <a class="btn btn-ghost" href="index.html">Back to Home</a>
             <button id="nextBtn" type="button" class="btn btn-primary">Next</button>
@@ -262,11 +292,13 @@
       </form>
     </div>
 
-    <!-- FINISH panel -->
-    <div id="finishPanel" class="finish-panel" aria-live="polite">
+    <!-- Standalone FINISH panel -->
+    <div id="finishPanel" class="finish-panel">
       <h3>Ready to get your estimate?</h3>
       <p class="muted">We’ll analyze your details against recent sales and market trends.</p>
-      <div style="margin:6px 0 16px;"><span class="pill" id="completedPill">0% complete</span></div>
+      <div style="margin:6px 0 16px;">
+        <span class="pill" id="completedPill">0% complete</span>
+      </div>
       <div class="finish-actions">
         <button id="finishSubmitBtn" class="btn btn-primary">Get estimate</button>
         <button id="editBackBtn" class="btn btn-ghost">Keep editing</button>
@@ -286,6 +318,7 @@
       <h3 id="paywallTitle" class="modal-title">Choose your report</h3>
       <button id="closeModalBtn" class="modal-close" aria-label="Close">×</button>
     </div>
+
     <div class="option-grid">
       <div class="option-card">
         <div class="badge">Most affordable</div>
@@ -298,14 +331,16 @@
           <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
           <li><span class="icon-neg">–</span><span>Market trend chart not included</span></li>
         </ul>
-        <div class="get-btn-wrap"><button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button></div>
+        <div class="get-btn-wrap">
+          <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+        </div>
       </div>
 
       <div class="option-card">
         <div class="badge">Best for selling</div>
         <h4>Sell-Ready PDF</h4>
         <p class="sub">Branded report (includes trend chart) to attach to your listing.</p>
-        <div class="price">$9.99</div>
+        <div class="price">$19</div>
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
           <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
@@ -313,7 +348,9 @@
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
           <li><span class="icon-pos">✓</span><span><strong>Market Trend Chart included</strong></span></li>
         </ul>
-        <div class="get-btn-wrap"><button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $9.99</button></div>
+        <div class="get-btn-wrap">
+          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+        </div>
       </div>
     </div>
   </div>
@@ -322,22 +359,22 @@
 <footer class="site-footer">
   <div class="container footer-grid">
     <div>© <span id="year"></span> Hullify</div>
-    <div class="footer-links"><a href="index.html">Home</a><a href="estimate.html">Estimate</a></div>
+    <div class="footer-links">
+      <a href="index.html">Home</a>
+      <a href="estimate.html">Estimate</a>
+    </div>
   </div>
 </footer>
 
-<noscript><div class="container" style="margin:16px auto;color:#9a2936;">JavaScript is required to use the Hullify estimate form.</div></noscript>
-
-  <script>
+<script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* -------------------------- ephemeral storage -------------------------- */
-  const STORAGE_KEY = "hullify:payload:v2";       // ephemeral (cleared after use)
+  /* -------------------------- constants & storage -------------------------- */
+  const STORAGE_KEY = "hullify:payload:v1";
   const PLAN_REVEAL = "reveal_199";
   const PLAN_PDF = "pdf_1900";
 
   function savePayload() {
-    const form = document.getElementById("fullEstimateForm");
     const data = Object.fromEntries(new FormData(form).entries());
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data }));
   }
@@ -346,18 +383,18 @@
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
       const obj = JSON.parse(raw);
-      // 24h TTL just in case user abandons flow
+      if (!obj || !obj.data) return null;
+      // 24h TTL
       if (Date.now() - (obj.t || 0) > 24 * 3600 * 1000) {
         localStorage.removeItem(STORAGE_KEY);
         return null;
       }
-      return obj.data || null;
-    } catch { return null; }
+      return obj.data;
+    } catch {
+      return null;
+    }
   }
-  function clearSaved() { localStorage.removeItem(STORAGE_KEY); }
-
   function restoreForm(payload) {
-    const form = document.getElementById("fullEstimateForm");
     if (!payload) return;
     [...form.elements].forEach(el => {
       if (!el.name) return;
@@ -393,8 +430,6 @@
     progressFill.style.width = pct + "%";
     progressPct.textContent = pct + "%";
     completedPill.textContent = `${pct}% complete`;
-    const bar = document.querySelector(".progress-bar");
-    if (bar) bar.setAttribute("aria-valuenow", String(pct));
   }
   trackable.forEach(el => ["input","change","blur"].forEach(evt => el.addEventListener(evt, updateProgress)));
   updateProgress();
@@ -460,6 +495,7 @@
   function openModal(){ paywallModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
   function closeModal(){ paywallModal.classList.remove('open'); document.body.style.overflow = ''; }
 
+  // Intercept "Get estimate" -> show modal
   document.getElementById("finishSubmitBtn").addEventListener("click", () => {
     if (!form.checkValidity()){
       exitFinishOnly();
@@ -480,6 +516,7 @@
   document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
   closeModalBtn.addEventListener('click', closeModal);
 
+  // ----------- Toggle this when you want Stripe enabled in prod -----------
   const USE_CHECKOUT = true;
 
   chooseRevealBtn.addEventListener('click', () => {
@@ -495,7 +532,7 @@
 
   choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
-      savePayload(); // persist before redirect
+      savePayload();
       window.location = '/api/checkout?plan=' + PLAN_PDF;
       return;
     }
@@ -506,10 +543,10 @@
   });
 
   /* ------------------------------ result flow ----------------------------- */
-  function showError(msg) {
-    resultBox.classList.remove("loading");
-    resultBox.classList.remove("hidden");
-    resultBox.innerHTML = `<p class="error">${msg || "Something went wrong. Please try again."}</p>`;
+  function showDownloadBtn(show){
+    const btn = document.getElementById("downloadPdfBtn");
+    if (!btn) return;
+    btn.classList.toggle("hidden", !show);
   }
 
   async function requestEstimate(payload){
@@ -523,19 +560,11 @@
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
     try {
-      // IMPORTANT: call your serverless function path
-      const res = await fetch("/api/estimate", {
+      const res = await fetch("/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload || {})
       });
-
-      if (!res.ok) {
-        const t = await res.text().catch(()=> "");
-        console.error("Estimate HTTP error:", res.status, t);
-        throw new Error("Estimate failed (" + res.status + ")");
-      }
-
       const data = await res.json();
 
       // results UI
@@ -558,9 +587,6 @@
         </div>
       `;
 
-      // Clear ephemeral saved payload after successful render
-      clearSaved();
-
       // wire download button
       const dl = document.getElementById("downloadPdfBtn");
       if (dl){
@@ -574,7 +600,7 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ ...(lastPayload||payload||{}), includeTrend: true })
             });
-            if (!pdfRes.ok) throw new Error("PDF failed: " + pdfRes.status);
+            if (!pdfRes.ok) throw new Error("PDF failed");
             const blob = await pdfRes.blob();
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -596,11 +622,12 @@
 
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (err) {
-      console.error(err);
       document.body.classList.remove("results-only");
       document.body.classList.add("finish-only");
       finishPanel.classList.remove("hidden");
-      showError("Something went wrong. Please try again.");
+
+      resultBox.classList.remove("loading");
+      resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
     }
   }
 
@@ -620,10 +647,12 @@
     const params = new URLSearchParams(location.search);
     const success = params.get("success") === "1";
     const plan = params.get("plan");
+
+    // Always try to restore fields, so users see their data if they come back.
     const saved = loadSaved();
+    if (saved) { restoreForm(saved); }
 
-    if (saved) restoreForm(saved);
-
+    // If we just returned from checkout and we have saved payload, reveal estimate.
     if (success && saved) {
       lastPayload = saved;
       allowDownloadPdf = (plan === PLAN_PDF);
@@ -633,8 +662,5 @@
     }
   })();
 </script>
-
-
-  
 </body>
 </html>
