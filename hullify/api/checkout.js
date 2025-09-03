@@ -5,20 +5,23 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, { apiVersion: "2024-06-
 
 function getOrigin(req) {
   const proto = req.headers["x-forwarded-proto"] || "https";
-  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:3000";
+  const host  = req.headers["x-forwarded-host"] || req.headers.host || "localhost:3000";
   return `${proto}://${host}`;
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "GET") return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "GET") {
+    res.setHeader("Allow", "GET");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
 
   try {
     const { plan } = req.query || {};
     const origin = getOrigin(req);
 
     const priceMap = {
-      reveal_199: { name: "Reveal Estimate (on-page)",         unit_amount: 199  }, // $1.99
-      pdf_1900:   { name: "Sell-Ready PDF (with Trend Chart)", unit_amount: 999  }, // $9.99  ⬅️ fixed comment
+      reveal_199: { name: "Reveal Estimate (on-page)",         unit_amount: 199 }, // $1.99
+      pdf_1900:   { name: "Sell-Ready PDF (with Trend Chart)", unit_amount: 999 }, // $9.99
     };
 
     const price = priceMap[plan];
@@ -36,7 +39,7 @@ export default async function handler(req, res) {
       }],
       client_reference_id: plan,
       success_url: `${origin}/estimate.html?success=1&plan=${encodeURIComponent(plan)}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/estimate.html?canceled=1`,
+      cancel_url:  `${origin}/estimate.html?canceled=1`,
     });
 
     res.writeHead(303, { Location: session.url }).end();
