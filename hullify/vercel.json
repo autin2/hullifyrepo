@@ -1,8 +1,5 @@
 {
   "rewrites": [
     { "source": "/estimate", "destination": "/api/estimate" }
-  ],
-  "redirects": [
-    { "source": "/", "destination": "/estimate.html", "permanent": false }
   ]
 }
