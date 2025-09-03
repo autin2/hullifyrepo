@@ -29,7 +29,7 @@ export default async function handler(req, res) {
       },
       pdf_1900: {
         name: "Sell-Ready PDF (with Trend Chart)",
-        unit_amount: 1900, // $19.00
+        unit_amount: 999, // $19.00
       },
     };
 
@@ -65,3 +65,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 }
+
