@@ -426,29 +426,55 @@
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  /* -------------------------- constants (no storage) -------------------------- */
+  /* -------------------------- constants & temp storage -------------------------- */
   const PLAN_REVEAL = "reveal_199";
   const PLAN_PDF = "pdf_1900";
 
-  // No persistence: stubs
-  function savePayload() {}
-  function loadSaved() { return null; }
-  function restoreForm(_) {}
+  const STORAGE_KEY = "hullify:payload:v1";
+  const STORAGE_TTL_MS = 2 * 60 * 60 * 1000; // 2 hours
+
+  function savePayload() {
+    const data = Object.fromEntries(new FormData(form).entries());
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data }));
+    } catch {}
+  }
+  function loadSaved() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || !obj.data) return null;
+      if (Date.now() - (obj.t || 0) > STORAGE_TTL_MS) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return obj.data;
+    } catch {
+      return null;
+    }
+  }
+  function clearSaved() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch {}
+  }
+  function restoreForm(payload) {
+    if (!payload) return;
+    [...form.elements].forEach(el => {
+      if (!el.name) return;
+      if (payload[el.name] === undefined) return;
+      if (el.type === "checkbox") {
+        const v = payload[el.name];
+        el.checked = v === "yes" || v === "on" || v === true || v === "true";
+      } else {
+        el.value = payload[el.name];
+      }
+    });
+    updateProgress();
+  }
 
   /* ------------------------------- progress ------------------------------- */
   const form = document.getElementById("fullEstimateForm");
-  // Kill autofill & previously cached values
   form.setAttribute("autocomplete", "off");
-  window.addEventListener("DOMContentLoaded", () => {
-    // In case back/forward cache or history restores values:
-    form.reset();
-    form.querySelectorAll("input, select, textarea").forEach(el => {
-      el.setAttribute("autocomplete", "off");
-      if (el.type === "checkbox") { el.checked = false; }
-      else { el.value = ""; }
-    });
-    updateProgress();
-  });
 
   const progressFill = document.getElementById("progressFill");
   const progressPct = document.getElementById("progressPct");
@@ -469,7 +495,6 @@
     progressFill.style.width = pct + "%";
     progressPct.textContent = pct + "%";
     completedPill.textContent = `${pct}% complete`;
-    // ARIA update
     const bar = document.querySelector(".progress-bar");
     if (bar) bar.setAttribute("aria-valuenow", String(pct));
   }
@@ -558,12 +583,12 @@
   document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
   closeModalBtn.addEventListener('click', closeModal);
 
-  // ----------- Toggle this when you want Stripe enabled in prod -----------
+  // ----------- Stripe checkout toggle -----------
   const USE_CHECKOUT = true;
 
   chooseRevealBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
-      // No save before redirect
+      savePayload(); // persist before redirect so we can reveal after success
       window.location = '/api/checkout?plan=' + PLAN_REVEAL;
       return;
     }
@@ -574,7 +599,7 @@
 
   choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
-      // No save before redirect
+      savePayload(); // persist before redirect so we can generate + enable PDF on return
       window.location = '/api/checkout?plan=' + PLAN_PDF;
       return;
     }
@@ -628,6 +653,9 @@
           </div>
         </div>
       `;
+
+      // We no longer need saved payload after rendering results
+      clearSaved();
 
       // wire download button
       const dl = document.getElementById("downloadPdfBtn");
@@ -684,13 +712,36 @@
     document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
 
-  /* --------------------- no restore after Stripe redirect --------------------- */
-  (function bootstrapFromQuery(){
+  /* --------------------- bootstrap (restore on Stripe return) --------------------- */
+  (function bootstrap(){
+    // Disable autofill on all fields
+    form.querySelectorAll("input, select, textarea").forEach(el => el.setAttribute("autocomplete", "off"));
+
     const params = new URLSearchParams(location.search);
     const success = params.get("success") === "1";
-    if (success) {
-      // Optional: toast or message
+    const plan = params.get("plan"); // expect PLAN_REVEAL or PLAN_PDF value
+
+    const saved = loadSaved();
+
+    if (success && saved){
+      // Coming back from checkout with a payload — restore and auto-run
+      restoreForm(saved);
+      lastPayload = saved;
+      allowDownloadPdf = (plan === PLAN_PDF);
+      // Clean URL early so refresh doesn't repeat
       history.replaceState(null, "", location.pathname);
+      // Jump straight to results
+      requestEstimate(saved);
+      return;
+    }
+
+    // Fresh visit: clear any stale UI values
+    if (!success || !saved){
+      form.reset();
+      form.querySelectorAll("input, select, textarea").forEach(el => {
+        if (el.type === "checkbox") el.checked = false; else el.value = "";
+      });
+      updateProgress();
     }
   })();
 </script>
