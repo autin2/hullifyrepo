@@ -12,33 +12,46 @@ const moneyNum = (s) => {
 };
 const money = (n) => (Number.isFinite(n) ? `$${Math.round(n).toLocaleString()}` : "$—");
 
+
+const toNumber = (v) => {
+  if (v == null) return null;
+  const n = Number(String(v).replace(/[^\d.-]/g, ""));
+  return Number.isFinite(n) ? n : null;
+};
+const normalizeValuation = (v) => {
+  if (!v) return null;
+  const estNum = v.estimateNumber ?? toNumber(v.estimate);
+  if (!Number.isFinite(estNum)) return null;
+  const est = Math.round(estNum / 100) * 100;
+  const lowN = v.range?.low ? toNumber(v.range.low) : Math.round(est * 0.97);
+  const highN = v.range?.high ? toNumber(v.range.high) : Math.round(est * 1.03);
+  return {
+    estimateNumber: est,
+    estimate: `$${est.toLocaleString()}`,
+    range: { low: `$${Math.round(lowN).toLocaleString()}`, high: `$${Math.round(highN).toLocaleString()}` },
+    confidence: v.confidence || v.confidenceScore || null,
+    rationale: v.rationale || v.notes || null,
+    comps: Array.isArray(v.comps) ? v.comps : undefined
+  };
+};
+
 function heuristic(payload) {
   const base = 35000;
   const lenAdj = (Number(payload.length) || 0) * 900;
   const yearAdj = Math.max(0, (Number(payload.year) || 0) - 2000) * 500;
   const condMap = { Excellent: 1.15, Good: 1.05, Fair: 0.85, "Needs Work": 0.65 };
   const factor = condMap[payload.condition] || 1;
-  const est = Math.round(((base + lenAdj + yearAdj) * factor) / 100) * 100;
+  const estNum = Math.round(((base + lenAdj + yearAdj) * factor) / 100) * 100;
 
-  const comps = Array.from({ length: 6 }).map((_, i) => ({
-    title: `${payload.make || "Boat"} ${payload.model || ""}`.trim(),
-    year: payload.year || 2016 + ((i % 6) - 2),
-    length: payload.length || 22,
-    price: money(est * (0.92 + i * 0.02)),
-    location: payload.location || "Local Market",
-    url: "https://hullify.net",
-  }));
-
-  const trend = Array.from({ length: 12 }).map((_, i) => ({
-    label: new Date(
-      Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth() - 11 + i, 1)
-    ).toLocaleString("en-US", { month: "short" }),
-    price: Math.round(est * (0.92 + 0.16 * (i / 11))),
-  }));
+  const comps = [
+    { title: "Local listing A", price: money(estNum * 0.98), url: "", meta: "Similar size/age" },
+    { title: "Local listing B", price: money(estNum * 1.02), url: "", meta: "Similar size/age" },
+    { title: "Recent sale C",   price: money(estNum * 0.95), url: "", meta: "Recent comp" },
+  ];
 
   return {
-    estimate: money(est),
-    range: { low: money(est * 0.97), high: money(est * 1.03) },
+    estimate: money(estNum),
+    range: { low: money(estNum * 0.97), high: money(estNum * 1.03) },
     confidence: "medium",
     rationale:
       "Heuristic model based on size, year and condition; tuned conservatively for current demand.",
@@ -50,319 +63,323 @@ function heuristic(payload) {
       .trim(),
     listingDescription: `Well-kept ${payload.length || "—"}’ ${payload.make || "boat"} ${
       payload.model || ""
-    } (${payload.year || "—"}). ${payload.condition || "Good"} condition. ${
-      payload.engine ? `Engine: ${payload.engine}. ` : ""
-    }${payload.trailer === "Yes" ? "Trailer included. " : ""}${
-      payload.aftermarket ? `Upgrades: ${payload.aftermarket}. ` : ""
-    }Priced to reflect current market.`,
-    negotiationBullets: [
-      "Priced using recent local comps",
-      "Condition-adjusted (transparent range)",
-      payload.trailer === "Yes"
-        ? "Includes trailer (value add)"
-        : "No trailer — priced accordingly",
-    ],
-    prepChecklist: [
-      "Deep clean hull & deck; remove personal items",
-      "Fresh photos: bow, helm, engine(s), trailer (if included)",
-      "Have maintenance receipts handy",
-    ],
-    upgradeTips: [
-      "LED courtesy/underwater lights can improve appeal",
-      "Detailing + minor upholstery fixes often 2–5× ROI",
-    ],
-    trend,
+    } (${payload.year || "unknown year"})
+${payload.engine ? `Engine: ${payload.engine}` : ""}${
+      payload.hours ? ` • ${payload.hours} hrs` : ""
+    }${payload.trailer ? " • Includes trailer" : ""}
+
+${payload.upgrades ? `Upgrades: ${payload.upgrades}` : ""}
+
+${payload.details || ""}`.trim()
   };
 }
 
-async function getValuation(payload, includeTrend) {
+async function getValuation(payload, includeTrend = true) {
+  // Try AI first, fallback to heuristic
   try {
     const messages = [
       {
         role: "system",
         content:
-          "You are a marine pricing assistant. Return JSON ONLY with keys: estimate (string like \"$68,500\"), range:{low,high}, confidence (low|medium|high), rationale, comps:[{title,price,year,length,location,url}], listingTitle, listingDescription, negotiationBullets[], prepChecklist[], upgradeTips[], trend:[{label,price}] (trend only if requested). Be conservative and adjust strongly for condition.",
+          "You write concise JSON fields for a used-boat valuation report. Keys: estimate ($12,300), range.low, range.high, confidence (low|medium|high), rationale (short, one sentence), comps (array of objects with title, price, url, meta), listingTitle, listingDescription. Keep numbers realistic and conservative."
       },
-      { role: "user", content: JSON.stringify({ ...payload, requestTrend: includeTrend }) },
+      {
+        role: "user",
+        content:
+          JSON.stringify({
+            make: payload.make || null,
+            model: payload.model || null,
+            year: payload.year || null,
+            length: payload.length || null,
+            condition: payload.condition || null,
+            hours: payload.hours || null,
+            engine: payload.engine || null,
+            trailer: payload.trailer || null,
+            fuel: payload.fuel || null,
+            storage: payload.storage || null,
+            upgrades: payload.upgrades || null,
+            details: payload.details || null,
+            outOfWaterYearPlus: payload.outOfWaterYearPlus || null,
+            location: payload.location || null,
+          })
+      }
     ];
 
     const resp = await client.chat.completions.create({
       model: "gpt-4o-mini",
-      response_format: { type: "json_object" },
       temperature: 0.2,
-      messages,
+      response_format: { type: "json_object" },
+      messages
     });
 
-    const parsed = JSON.parse(resp.choices?.[0]?.message?.content || "{}");
-    const estN = moneyNum(parsed.estimate);
-    if (!estN) return heuristic(payload);
+    const text = resp.choices?.[0]?.message?.content || "{}";
+    let data;
+    try { data = JSON.parse(text); } catch { data = {}; }
+    if (!data.estimate) data = {};
 
-    if (!Array.isArray(parsed.comps) || parsed.comps.length === 0) {
-      parsed.comps = heuristic(payload).comps;
+    // Ensure minimum fields
+    if (!data.estimate) {
+      data = heuristic(payload);
     }
-    if (includeTrend && (!Array.isArray(parsed.trend) || parsed.trend.length < 6)) {
-      parsed.trend = heuristic(payload).trend;
-    }
-    return parsed;
+    return data;
   } catch (e) {
-    console.error("AI enrich error:", e);
     return heuristic(payload);
   }
 }
 
-/* ----------------------------- drawing helpers ----------------------------- */
+/* --------------------------- PDF builder --------------------------- */
 const COLORS = {
-  primary: "#002B5B",
-  dark: "#0b1b2b",
-  muted: "#5f7183",
-  border: "#e6ecf3",
+  bg: "#FFFFFF",
+  ink: "#0c1b2a",
+  primary: "#1446A0",
+  muted: "#58708C",
+  soft: "#E9EEF5",
+  success: "#198754",
+  chip: "#F5F8FF",
+  dark: "#1A2A3A",
 };
 
-function drawStamp(doc, cx, cy, r = 44) {
-  doc.save();
-  doc.circle(cx, cy, r).lineWidth(3).strokeColor(COLORS.primary).stroke();
-  doc.circle(cx, cy, r - 8).lineWidth(1).strokeColor(COLORS.primary + "aa").stroke();
-  doc.fontSize(10).fillColor(COLORS.primary).text("HULLIFY", cx - 20, cy - 9);
-  doc.fontSize(15).fillColor(COLORS.primary);
-  doc.translate(cx, cy).rotate(-18).text("VERIFIED", -36, -7);
-  doc.restore();
+function textBlock(doc, text, x, y, width, options = {}) {
+  const {
+    size = 10,
+    color = COLORS.ink,
+    lineGap = 3,
+    align = "left",
+    leading = 1.2,
+    bold = false,
+  } = options;
+
+  if (bold) doc.font("Helvetica-Bold");
+  else doc.font("Helvetica");
+
+  doc
+    .fillColor(color)
+    .fontSize(size)
+    .text(text, x, y, { width, align, lineGap, continued: false });
+
+  const { y: yAfter } = doc;
+  return yAfter;
 }
 
-function textBlock(doc, text, x, y, width, opts = {}) {
-  const { size = 10, color = COLORS.dark, align = "left" } = opts;
-  doc.fontSize(size).fillColor(color);
-  const h = doc.heightOfString(String(text || ""), { width, align });
-  doc.text(String(text || ""), x, y, { width, align });
-  return y + h;
+function header(doc, title) {
+  doc.rect(0, 0, doc.page.width, 100).fill(COLORS.chip);
+  doc.fillColor(COLORS.primary).font("Helvetica-Bold").fontSize(20).text("Hullify", 40, 28);
+  doc.fillColor(COLORS.ink).font("Helvetica-Bold").fontSize(16).text(title, 40, 60);
+  doc.fillColor(COLORS.ink);
 }
 
-function drawComps(doc, comps, x, y, width, margins) {
-  const rowH = 16;
-  const cols = { title: x, yl: x + 230, price: x + 320, loc: x + 400 };
+function drawChip(doc, label, x, y) {
+  const paddingX = 8, paddingY = 4;
+  const w = doc.widthOfString(label) + paddingX * 2;
+  const h = doc.currentLineHeight() + paddingY * 2;
+  doc.roundedRect(x, y, w, h, 8).fill(COLORS.chip);
+  doc.fillColor(COLORS.primary).text(label, x + paddingX, y + paddingY);
+  doc.fillColor(COLORS.ink);
+  return { w, h };
+}
 
-  // header
-  doc.fontSize(10).fillColor(COLORS.muted);
-  doc.text("Title", cols.title, y);
-  doc.text("Year/Len", cols.yl, y);
-  doc.text("Price", cols.price, y);
-  doc.text("Location", cols.loc, y);
-  doc.moveTo(x, y + 12).lineTo(x + width, y + 12).strokeColor(COLORS.border).lineWidth(1).stroke();
-  y += 16;
+async function buildPdf(payload, valuation, includeTrend = true) {
+  const doc = new PDFDocument({ size: "LETTER", margin: 40 });
+  const buffers = [];
+  doc.on("data", (b) => buffers.push(b));
+  doc.on("end", () => {});
+
+  const margins = { left: 40, top: 112, right: 40, bottom: 40 };
+  const usableW = doc.page.width - margins.left - margins.right;
+
+  // Header
+  header(doc, "Boat Valuation Report");
+
+  // Summary group
+  let y = margins.top;
+  const leftColW = Math.floor(usableW * 0.5) - 10;
+  const rightColW = Math.floor(usableW * 0.5) - 10;
+
+  // Left summary
+  doc.font("Helvetica-Bold").fontSize(14).fillColor(COLORS.dark).text("Estimated Value", margins.left, y);
+  y += 24;
+
+  doc.font("Helvetica-Bold").fontSize(24).fillColor(COLORS.primary)
+    .text(valuation.estimate || "$—", margins.left, y);
+
+  y += 36;
+
+  // Range & confidence
+  doc.font("Helvetica").fontSize(10).fillColor(COLORS.muted)
+    .text(
+      `Range: ${valuation.range?.low || "$—"} – ${valuation.range?.high || "$—"}  •  Confidence: ${valuation.confidence || "—"}`,
+      margins.left, y, { width: leftColW }
+    );
+
+  y += 20;
+
+  // Payload facts chips
+  const chips = [
+    payload.year && `Year ${payload.year}`,
+    payload.length && `${payload.length} ft`,
+    payload.make && payload.make,
+    payload.model && payload.model,
+    payload.condition && payload.condition
+  ].filter(Boolean);
+
+  let cx = margins.left, cy = y;
+  doc.font("Helvetica").fontSize(10);
+  for (const chip of chips) {
+    const { w, h } = drawChip(doc, chip, cx, cy);
+    cx += w + 8;
+    if (cx + 80 > margins.left + leftColW) { cx = margins.left; cy += h + 6; }
+  }
+
+  y = Math.max(cy + 30, y + 30);
+
+  // Right summary: small comps table
+  const comps = Array.isArray(valuation.comps) ? valuation.comps.slice(0, 3) : [];
+  doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Sample Comparables", margins.left + leftColW + 20, margins.top);
+  let yRight = margins.top + 20;
 
   comps.forEach((c) => {
-    const bottomLimit = doc.page.height - margins.bottom;
-    if (y + rowH > bottomLimit) {
-      doc.addPage();
-      y = margins.top;
-
-      // reprint header
-      doc.fontSize(10).fillColor(COLORS.muted);
-      doc.text("Title", cols.title, y);
-      doc.text("Year/Len", cols.yl, y);
-      doc.text("Price", cols.price, y);
-      doc.text("Location", cols.loc, y);
-      doc.moveTo(x, y + 12).lineTo(x + width, y + 12).strokeColor(COLORS.border).lineWidth(1).stroke();
-      y += 16;
+    doc.font("Helvetica").fontSize(10).fillColor(COLORS.ink).text(`• ${c.title || "Comparable"}`, margins.left + leftColW + 20, yRight, { width: rightColW });
+    yRight += 14;
+    if (c.meta || c.price) {
+      doc.fontSize(9).fillColor(COLORS.muted).text(`${c.meta || ""} ${c.price ? " • " + c.price : ""}`, margins.left + leftColW + 20, yRight, { width: rightColW });
+      yRight += 12;
     }
-
-    doc.fontSize(10).fillColor(COLORS.dark).text(c.title || "—", cols.title, y, { width: 220 });
-    doc.fillColor(COLORS.muted).text(`${c.year || "—"}/${c.length || "—"}'`, cols.yl, y);
-    doc.fillColor(COLORS.dark).text(c.price || "$—", cols.price, y);
-    doc.fillColor(COLORS.muted).text(c.location || "—", cols.loc, y, { width: 120 });
-    y += rowH;
   });
 
-  return y;
-}
+  y = Math.max(y, yRight) + 16;
 
-/* ------------------------------- PDF builder ------------------------------- */
-async function buildPdf(payload, valuation, includeTrend) {
-  return new Promise((resolve) => {
-    const margins = { top: 60, right: 50, bottom: 60, left: 50 };
-    const doc = new PDFDocument({ size: "LETTER", margins });
-    const bufs = [];
-    doc.on("data", (d) => bufs.push(d));
-    doc.on("end", () => resolve(Buffer.concat(bufs)));
+  // Details section
+  doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Boat Details", margins.left, y);
+  y += 18;
 
-    const pageW = doc.page.width;
-    const usableW = pageW - margins.left - margins.right;
+  const details = [
+    ["Make", payload.make || "—"],
+    ["Model", payload.model || "—"],
+    ["Year", payload.year || "—"],
+    ["Length", payload.length ? `${payload.length} ft` : "—"],
+    ["Condition", payload.condition || "—"],
+    ["Engine", payload.engine || "—"],
+    ["Hours", payload.hours || "—"],
+    ["Trailer", payload.trailer ? "Yes" : "No"],
+    ["Fuel", payload.fuel || "—"],
+    ["Storage", payload.storage || "—"],
+    ["Upgrades", payload.upgrades || "—"],
+  ];
 
-    /* ------------------------------- PAGE 1 ------------------------------- */
-    let y = margins.top;
+  const col1W = Math.floor(usableW * 0.35);
+  const col2W = usableW - col1W;
 
-    // Title + timestamp (fixed positions)
-    doc.fontSize(18).fillColor(COLORS.primary).text("Hullify — Verified Valuation", margins.left, y);
-    y += 22;
-    doc.fontSize(9).fillColor(COLORS.muted)
-      .text(`Verified by Hullify.net • ${new Date().toLocaleString()}`, margins.left, y);
+  details.forEach(([k, v]) => {
+    doc.font("Helvetica-Bold").fontSize(10).fillColor(COLORS.muted).text(k, margins.left, y, { width: col1W });
+    doc.font("Helvetica").fontSize(10).fillColor(COLORS.ink).text(v, margins.left + col1W, y, { width: col2W });
+    y += 16;
+  });
 
-    // stamp top-right
-    drawStamp(doc, pageW - margins.right - 34, margins.top + 12);
+  y += 8;
 
-    y += 22;
+  // Rationale
+  doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Why this estimate?", margins.left, y);
+  y += 16;
+  y = textBlock(
+    doc,
+    valuation.rationale || "Estimate considers size, age, features, general condition and current buyer demand.",
+    margins.left, y, usableW, { size: 10, color: COLORS.ink }
+  ) + 10;
 
-    // Boat meta centered
-    const boatLine = `${payload.make || ""} ${payload.model || ""}`.trim() || "Boat";
-    const metaLine = `${payload.year || "—"} • ${payload.length || "—"} ft • ${payload.vesselClass || "—"} • ${payload.hullMaterial || "—"}`;
-
-    doc.fontSize(14).fillColor(COLORS.dark).text(boatLine, margins.left, y, { width: usableW, align: "center" });
-    y += 18;
-    doc.fontSize(10).fillColor(COLORS.muted).text(metaLine, margins.left, y, { width: usableW, align: "center" });
-    y += 22;
-
-    // Value card (well below stamp)
-    const cardW = 420, cardH = 110;
-    const cardX = margins.left + (usableW - cardW) / 2;
-    const cardY = y;
-    doc.roundedRect(cardX, cardY, cardW, cardH, 12).lineWidth(1).strokeColor(COLORS.border).stroke();
-    doc.fontSize(11).fillColor(COLORS.muted).text("Estimated Value", cardX + 16, cardY + 14);
-    doc.fontSize(32).fillColor(COLORS.primary).text(valuation.estimate || "$—", cardX + 16, cardY + 40);
-    doc.fontSize(10).fillColor(COLORS.muted)
-      .text(`Range: ${valuation.range?.low || "$—"} – ${valuation.range?.high || "$—"}   •   Confidence: ${valuation.confidence || "—"}`, cardX + 16, cardY + 78);
-
-    y = cardY + cardH + 18;
-    y = textBlock(doc,
-      "This report has been digitally verified by Hullify and supports a fair listing price based on size, age, condition, and local comparables.",
-      margins.left, y, usableW, { size: 10, color: COLORS.muted, align: "center" }
-    );
+  // Optional market trend
+  if (includeTrend) {
     doc.addPage();
+    header(doc, "Market Snapshot & Selling Tips");
 
-    /* ------------------------------- PAGE 2 ------------------------------- */
-    y = margins.top;
+    let y2 = margins.top;
 
-    // Why this price
-    y = textBlock(doc, "Why this price", margins.left, y, usableW, { size: 14, color: COLORS.dark }) + 4;
-    y = textBlock(doc, valuation.rationale || "—", margins.left, y, usableW, { size: 10, color: COLORS.muted }) + 12;
-
-    // two columns for details
-    const colW = (usableW - 28) / 2;
-    const leftX = margins.left;
-    const rightX = margins.left + colW + 28;
-
-    let yL = y, yR = y;
-
-    // Boat details (left)
-    yL = textBlock(doc, "Boat Details", leftX, yL, colW, { size: 12, color: COLORS.dark }) + 4;
-    [
-      ["Condition", payload.condition || "—"],
-      ["Runs", payload.runs || "—"],
-      ["Engine", payload.engine || "—"],
-      ["Engine Hours", payload.engineHours || "—"],
-      ["Fuel", payload.fuelType || "—"],
-      ["Engines", payload.engineCount || "—"],
-      ["Storage", payload.outOfWaterYearPlus ? "Out of water ≥1yr" : "—"],
-    ].forEach(([k, v]) => { yL = textBlock(doc, `${k}: ${v}`, leftX, yL, colW, { size: 10, color: COLORS.muted }); });
-
-    // Ownership (right)
-    yR = textBlock(doc, "Ownership & Location", rightX, yR, colW, { size: 12, color: COLORS.dark }) + 4;
-    [
-      ["Location", payload.location || "—"],
-      ["Trailer", payload.trailer || "—"],
-      ["Title", payload.titleStatus || "—"],
-    ].forEach(([k, v]) => { yR = textBlock(doc, `${k}: ${v}`, rightX, yR, colW, { size: 10, color: COLORS.muted }); });
-
-    y = Math.max(yL, yR) + 14;
-
-    // Comps table (auto-flows)
-    y = textBlock(doc, "Recent Comparable Listings/Sales", margins.left, y, usableW, { size: 12, color: COLORS.dark }) + 4;
-    doc.y = y;
-    y = drawComps(doc, (valuation.comps || []).slice(0, 30), margins.left, doc.y, usableW, margins);
-
-    /* ------------------------------- PAGE 3 ------------------------------- */
-    doc.addPage();
-    y = margins.top;
-
-    if (includeTrend && Array.isArray(valuation.trend) && valuation.trend.length >= 6) {
-      y = textBlock(doc, "Market Trend (last 12 months)", margins.left, y, usableW, { size: 12, color: COLORS.dark }) + 6;
-
-      const chart = { x: margins.left, y, w: usableW, h: 190 };
-      const prices = valuation.trend.map((t) => Number(t.price));
-      const min = Math.min(...prices);
-      const max = Math.max(...prices);
-      const pad = (max - min) * 0.1 || 1;
-      const yMin = min - pad;
-      const yMax = max + pad;
-
-      // frame
-      doc.strokeColor(COLORS.border).lineWidth(1).rect(chart.x, chart.y, chart.w, chart.h).stroke();
-
-      // line
-      doc.strokeColor("#014a8c").lineWidth(2);
-      valuation.trend.forEach((p, i) => {
-        const x = chart.x + (i / (valuation.trend.length - 1)) * chart.w;
-        const yVal = chart.y + chart.h - ((Number(p.price) - yMin) / (yMax - yMin)) * chart.h;
-        if (i === 0) doc.moveTo(x, yVal); else doc.lineTo(x, yVal);
-      });
-      doc.stroke();
-
-      // labels
-      doc.fontSize(9).fillColor(COLORS.muted);
-      doc.text(money(yMax), chart.x, chart.y - 12);
-      doc.text(money(yMin), chart.x, chart.y + chart.h + 2);
-      valuation.trend.forEach((p, i) => {
-        if (i % 2) return;
-        const lx = chart.x + (i / (valuation.trend.length - 1)) * chart.w - 8;
-        doc.text(p.label || "", lx, chart.y + chart.h + 14, { width: 30, align: "center" });
-      });
-
-      y = chart.y + chart.h + 36;
-    }
-
-    // Two tidy columns for copy & tips — independent cursors (no overlap)
-    const copyColW = (usableW - 34) / 2;
-    const cLeft = margins.left;
-    const cRight = margins.left + copyColW + 34;
-
-    let yLeft = y, yRight = y;
-
-    // Listing copy
-    yLeft = textBlock(doc, "Listing Copy", cLeft, yLeft, copyColW, { size: 12, color: COLORS.dark }) + 2;
-    yLeft = textBlock(doc, valuation.listingTitle || "—", cLeft, yLeft, copyColW, { size: 11, color: COLORS.primary }) + 2;
-    yLeft = textBlock(doc, valuation.listingDescription || "—", cLeft, yLeft, copyColW, { size: 10, color: COLORS.dark });
-
-    // Negotiation bullets
-    yRight = textBlock(doc, "Negotiation Bullets", cRight, yRight, copyColW, { size: 12, color: COLORS.dark }) + 2;
-    (valuation.negotiationBullets || []).forEach((b) => {
-      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, { size: 10, color: COLORS.muted });
-    });
-
-    // Align both, then next left block
-    y = Math.max(yLeft, yRight) + 12;
-
-    // Prep checklist
-    yLeft = textBlock(doc, "Prep Checklist", cLeft, y, copyColW, { size: 12, color: COLORS.dark }) + 2;
-    (valuation.prepChecklist || []).forEach((b) => {
-      yLeft = textBlock(doc, `□ ${b}`, cLeft, yLeft, copyColW, { size: 10, color: COLORS.muted });
-    });
-
-    // Upgrade tips (right)
-    yRight = textBlock(doc, "Upgrade ROI Tips", cRight, y, copyColW, { size: 12, color: COLORS.dark }) + 2;
-    (valuation.upgradeTips || []).forEach((b) => {
-      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, { size: 10, color: COLORS.muted });
-    });
-
-    y = Math.max(yLeft, yRight) + 16;
-
-    // footer
-    textBlock(
+    doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Market Snapshot", margins.left, y2);
+    y2 += 16;
+    y2 = textBlock(
       doc,
-      "This is a non-binding estimate based on market trends and comparable sales. Not a marine survey or legal appraisal.",
-      margins.left, y, usableW, { size: 8, color: COLORS.muted }
-    );
+      "Used-boat prices have been generally steady this quarter with slightly longer time-to-sale. Expect well-presented listings with strong photos and maintenance records to command the upper range.",
+      margins.left, y2, usableW, { size: 10, color: COLORS.ink }
+    ) + 10;
 
-    doc.end();
+    // comps list (expanded)
+    const compsList = Array.isArray(valuation.comps) ? valuation.comps : [];
+    if (compsList.length) {
+      doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Comparable Listings", margins.left, y2);
+      y2 += 14;
+      compsList.forEach((c) => {
+        doc.font("Helvetica").fontSize(10).fillColor(COLORS.ink).text(`• ${c.title || "Comparable"} — ${c.price || ""} ${c.meta ? " • " + c.meta : ""}`, margins.left, y2, { width: usableW });
+        y2 += 12;
+      });
+      y2 += 10;
+    }
+
+    // Listing content
+    doc.font("Helvetica-Bold").fontSize(12).fillColor(COLORS.dark).text("Suggested Listing Copy", margins.left, y2);
+    y2 += 16;
+    y2 = textBlock(
+      doc,
+      valuation.listingTitle || `${payload.year || ""} ${payload.make || ""} ${payload.model || ""}`.trim(),
+      margins.left, y2, usableW, { size: 11, color: COLORS.primary, bold: true }
+    ) + 8;
+    y2 = textBlock(
+      doc,
+      valuation.listingDescription || "Clean, well-kept boat. Priced fairly for current market. Serious buyers only.",
+      margins.left, y2, usableW, { size: 10, color: COLORS.ink }
+    ) + 16;
+
+    // Prep checklist & upgrade tips columns
+    const colW = Math.floor(usableW / 2) - 10;
+    const cLeft = margins.left;
+    const cRight = margins.left + colW + 20;
+
+    let yLeft = textBlock(doc, "Pre-Sale Prep Checklist", cLeft, y2, colW, { size: 12, color: COLORS.dark }) + 2;
+    (valuation.prepChecklist || [
+      "Deep clean inside & out",
+      "Service engine + fresh fluids",
+      "Gather maintenance records",
+      "Great photos: exterior/interior, helm, engine, trailer",
+      "List upgrades & accessories clearly",
+    ]).forEach((b) => {
+      yLeft = textBlock(doc, `• ${b}`, cLeft, yLeft, colW, { size: 10, color: COLORS.muted });
+    });
+
+    let yRight = textBlock(doc, "Upgrade ROI Tips", cRight, y2, colW, { size: 12, color: COLORS.dark }) + 2;
+    (valuation.upgradeTips || [
+      "New batteries if weak",
+      "Fresh bottom paint if needed",
+      "Detail & oxidation removal",
+      "Trailer tires & lights working",
+      "Sea-trial ready: no warning lights",
+    ]).forEach((b) => {
+      yRight = textBlock(doc, `• ${b}`, cRight, yRight, colW, { size: 10, color: COLORS.muted });
+    });
+  }
+
+  doc.end();
+  return new Promise((resolve) => {
+    doc.on("end", () => resolve(Buffer.concat(buffers)));
   });
 }
 
-/* --------------------------------- API -------------------------------- */
+/* --------------------------- API handler --------------------------- */
 export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Use POST" });
 
   try {
-    const payload = req.body || {};
-    const includeTrend = payload.includeTrend !== false; // default true
+    let body = req.body;
+    if (typeof body === "string") {
+      try { body = JSON.parse(body); } catch { body = {}; }
+    }
+    body = body || {};
 
-    const valuation = await getValuation(payload, includeTrend);
+    const payload = body.payload || body || {};
+    const includeTrend = body.includeTrend !== false; // default true
+
+    let valuation = normalizeValuation(body.valuation);
+    if (!valuation) {
+      valuation = await getValuation(payload, includeTrend);
+    }
+
     const pdfBuffer = await buildPdf(payload, valuation, includeTrend);
 
     const fname = `Hullify_Valuation_${(payload.make || "Boat").replace(/\s+/g, "_").slice(0, 32)}_${payload.year || ""}.pdf`;
