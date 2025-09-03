@@ -340,7 +340,7 @@
         <div class="badge">Best for selling</div>
         <h4>Sell-Ready PDF</h4>
         <p class="sub">Branded report (includes trend chart) to attach to your listing.</p>
-        <div class="price">$19</div>
+        <div class="price">$9.99</div>
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
           <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
@@ -349,7 +349,7 @@
           <li><span class="icon-pos">✓</span><span><strong>Market Trend Chart included</strong></span></li>
         </ul>
         <div class="get-btn-wrap">
-          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $9.99</button>
         </div>
       </div>
     </div>
@@ -372,7 +372,7 @@
   /* -------------------------- constants & storage -------------------------- */
   const STORAGE_KEY = "hullify:payload:v1";
   const PLAN_REVEAL = "reveal_199";
-  const PLAN_PDF = "pdf_1900";
+  const PLAN_PDF = "pdf_999";   // was "pdf_1900" ($19). Now $9.99.
 
   function savePayload() {
     const data = Object.fromEntries(new FormData(form).entries());
@@ -560,7 +560,7 @@
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
     try {
-      const res = await fetch("/estimate", {
+      const res = await fetch("/api/estimate", {   // <- use API route directly
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload || {})
