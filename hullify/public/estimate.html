@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Basic -->
+  <!-- Basic SEO -->
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hullify — Boat Value Estimate Tool (Fast & Accurate)</title>
@@ -22,49 +22,31 @@
   <meta name="twitter:description" content="Fast, accurate boat valuation with optional sell-ready PDF.">
   <meta name="twitter:image" content="https://your-domain.com/img/og-hullify.png">
 
-  <!-- Prefs -->
   <link rel="preload" href="style.css" as="style">
   <link rel="stylesheet" href="style.css"/>
 
-  <!-- Page-local helpers for the wizard + finish/results views -->
   <style>
     .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
     .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
     .section-title{margin:0 0 8px;color:var(--primary);font-size:16px}
-    .wizard-step{display:none}
-    .wizard-step.active{display:block}
+    .wizard-step{display:none}.wizard-step.active{display:block}
     .row-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .row-3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
     @media (max-width:900px){.row-2,.row-3{grid-template-columns:1fr}}
     .wizard-nav{display:flex;gap:10px;flex-wrap:wrap;justify-content:space-between;margin-top:8px}
-    .left-actions{display:flex;gap:10px;flex-wrap:wrap}
-    .right-actions{display:flex;gap:10px;flex-wrap:wrap}
+    .left-actions,.right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
-    #finishPanel{display:none}
-    .finish-only #finishPanel{display:block}
-    .finish-panel{
-      max-width:760px;margin:28px auto 0;
-      border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;
-      background:
-        radial-gradient(800px 160px at 50% -40px, #cfe2ff 0%, transparent 60%),
-        linear-gradient(180deg,#fff 0%, #f7fbff 100%);
-      box-shadow:0 10px 30px rgba(0,0,0,.06);
-    }
+    #finishPanel{display:none}.finish-only #finishPanel{display:block}
+    .finish-panel{max-width:760px;margin:28px auto 0;border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;background:radial-gradient(800px 160px at 50% -40px,#cfe2ff 0,transparent 60%),linear-gradient(180deg,#fff 0,#f7fbff 100%);box-shadow:0 10px 30px rgba(0,0,0,.06)}
     .finish-panel h3{margin:0 0 6px;color:var(--primary);font-size:22px}
     .finish-panel .muted{margin:0 0 16px}
     .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
-    .finish-only .card.big, .finish-only .progress-wrap{display:none}
-
-    /* Paywall modal (from earlier steps) */
-    .modal{position:fixed;inset:0;display:none}
-    .modal.open{display:block}
+    .finish-only .card.big,.finish-only .progress-wrap{display:none}
+    .modal{position:fixed;inset:0;display:none}.modal.open{display:block}
     .modal-backdrop{position:absolute;inset:0;background:rgba(6,22,41,.55)}
-    .modal-box{
-      position:relative;z-index:2;max-width:900px;margin:60px auto;background:#fff;border-radius:16px;
-      border:1px solid var(--border);padding:18px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)
-    }
+    .modal-box{position:relative;z-index:2;max-width:900px;margin:60px auto;background:#fff;border-radius:16px;border:1px solid var(--border);padding:18px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
     .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
     .modal-title{margin:0;color:var(--primary)}
     .modal-close{border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer}
@@ -76,38 +58,19 @@
     .option-card .price{font-weight:800;color:var(--primary);font-size:22px;margin:6px 0 10px}
     .feature-list{list-style:none;padding:0;margin:0 0 12px}
     .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--muted)}
-    .icon-pos{color:#067642;font-weight:900}
-    .icon-neg{color:#9a2936;font-weight:900}
+    .icon-pos{color:#067642;font-weight:900}.icon-neg{color:#9a2936;font-weight:900}
     .get-btn-wrap{display:flex;align-items:flex-end;justify-content:center;margin-top:14px}
   </style>
 
-  <!-- Structured Data (Organization & WebSite) -->
+  <!-- Structured Data -->
   <script type="application/ld+json">
   {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "Organization",
-        "name": "Hullify",
-        "url": "https://your-domain.com",
-        "logo": "https://your-domain.com/img/logo.png"
-      },
-      {
-        "@type": "WebSite",
-        "name": "Hullify",
-        "url": "https://your-domain.com",
-        "potentialAction": {
-          "@type": "SearchAction",
-          "target": "https://your-domain.com/search?q={query}",
-          "query-input": "required name=query"
-        }
-      },
-      {
-        "@type": "WebPage",
-        "name": "Boat Value Estimate",
-        "url": "https://your-domain.com/estimate.html",
-        "description": "Fast, accurate boat value estimates with optional sell-ready PDF report."
-      }
+    "@context":"https://schema.org",
+    "@graph":[
+      {"@type":"Organization","name":"Hullify","url":"https://your-domain.com","logo":"https://your-domain.com/img/logo.png"},
+      {"@type":"WebSite","name":"Hullify","url":"https://your-domain.com",
+        "potentialAction":{"@type":"SearchAction","target":"https://your-domain.com/search?q={query}","query-input":"required name=query"}},
+      {"@type":"WebPage","name":"Boat Value Estimate","url":"https://your-domain.com/estimate.html","description":"Fast, accurate boat value estimates with optional sell-ready PDF report."}
     ]
   }
   </script>
@@ -115,10 +78,7 @@
 <body>
 <header class="site-header" role="banner">
   <div class="container nav">
-    <div class="brand" aria-label="Hullify">
-      <span class="logo-dot" aria-hidden="true"></span>
-      <span>Hullify</span>
-    </div>
+    <div class="brand" aria-label="Hullify"><span class="logo-dot" aria-hidden="true"></span><span>Hullify</span></div>
     <nav class="nav-links" aria-label="Primary">
       <a href="index.html">Home</a>
       <a href="estimate.html" class="active" aria-current="page">Estimate</a>
@@ -136,10 +96,7 @@
 
     <!-- Progress -->
     <div class="progress-wrap" aria-live="polite">
-      <div class="progress-meta">
-        <span>Progress</span>
-        <span id="progressPct">0%</span>
-      </div>
+      <div class="progress-meta"><span>Progress</span><span id="progressPct">0%</span></div>
       <div class="progress-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
         <div class="progress-fill" id="progressFill" style="width:0%"></div>
       </div>
@@ -151,62 +108,43 @@
         <!-- 1) Boat basics -->
         <div class="form-section wizard-step active" data-step="1">
           <h2 class="section-title">Boat basics</h2>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="make">Make</label>
-              <input id="make" type="text" name="make" placeholder="e.g., Boston Whaler" required autocomplete="off" />
+              <input id="make" type="text" name="make" placeholder="e.g., Boston Whaler" required autocomplete="off"/>
             </div>
             <div class="stack">
               <label class="label" for="model">Model</label>
-              <input id="model" type="text" name="model" placeholder="e.g., 210 Outrage" required autocomplete="off" />
+              <input id="model" type="text" name="model" placeholder="e.g., 210 Outrage" required autocomplete="off"/>
             </div>
           </div>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="year">Year</label>
-              <input id="year" type="number" name="year" placeholder="e.g., 2018" min="1950" max="2035" required autocomplete="off" inputmode="numeric" />
+              <input id="year" type="number" name="year" placeholder="e.g., 2018" min="1950" max="2035" required autocomplete="off" inputmode="numeric"/>
             </div>
             <div class="stack">
               <label class="label" for="length">Length (ft)</label>
-              <input id="length" type="number" name="length" placeholder="e.g., 23" min="8" max="200" step="0.1" required autocomplete="off" inputmode="decimal" />
+              <input id="length" type="number" name="length" placeholder="e.g., 23" min="8" max="200" step="0.1" required autocomplete="off" inputmode="decimal"/>
             </div>
           </div>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="vesselClass">Class</label>
               <select id="vesselClass" name="vesselClass" autocomplete="off">
                 <option value="" disabled selected>Select class</option>
-                <option>Center Console</option>
-                <option>Dual Console</option>
-                <option>Walkaround</option>
-                <option>Cuddy Cabin</option>
-                <option>Bowrider</option>
-                <option>Deck Boat</option>
-                <option>Bay Boat</option>
-                <option>Jon Boat</option>
-                <option>Pontoon</option>
-                <option>Cabin Cruiser</option>
-                <option>Sportfisher / Convertible</option>
-                <option>Express Cruiser</option>
-                <option>Trawler</option>
-                <option>Sailboat</option>
-                <option>RIB / Inflatable</option>
-                <option>Jet Boat</option>
-                <option>Other</option>
+                <option>Center Console</option><option>Dual Console</option><option>Walkaround</option>
+                <option>Cuddy Cabin</option><option>Bowrider</option><option>Deck Boat</option><option>Bay Boat</option>
+                <option>Jon Boat</option><option>Pontoon</option><option>Cabin Cruiser</option><option>Sportfisher / Convertible</option>
+                <option>Express Cruiser</option><option>Trawler</option><option>Sailboat</option><option>RIB / Inflatable</option>
+                <option>Jet Boat</option><option>Other</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="hullMaterial">Hull material</label>
               <select id="hullMaterial" name="hullMaterial" autocomplete="off">
                 <option value="" disabled selected>Select hull material</option>
-                <option>Fiberglass</option>
-                <option>Aluminum</option>
-                <option>Wood</option>
-                <option>Steel</option>
-                <option>Other</option>
+                <option>Fiberglass</option><option>Aluminum</option><option>Wood</option><option>Steel</option><option>Other</option>
               </select>
             </div>
           </div>
@@ -215,38 +153,31 @@
         <!-- 2) Condition & usage -->
         <div class="form-section wizard-step" data-step="2">
           <h2 class="section-title">Condition &amp; usage</h2>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="condition">Overall condition</label>
               <select id="condition" name="condition" required autocomplete="off">
                 <option value="" disabled selected>Select condition</option>
-                <option>Excellent</option>
-                <option>Good</option>
-                <option>Fair</option>
-                <option>Needs Work</option>
+                <option>Excellent</option><option>Good</option><option>Fair</option><option>Needs Work</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="runs">Does it run?</label>
               <select id="runs" name="runs" required autocomplete="off">
                 <option value="" disabled selected>Select</option>
-                <option>Yes</option>
-                <option>Starts but stalls</option>
-                <option>No</option>
+                <option>Yes</option><option>Starts but stalls</option><option>No</option>
               </select>
             </div>
           </div>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="engineHours">Engine hours (approx.)</label>
-              <input id="engineHours" type="number" name="engineHours" placeholder="e.g., 520" min="0" autocomplete="off" inputmode="numeric" />
+              <input id="engineHours" type="number" name="engineHours" placeholder="e.g., 520" min="0" autocomplete="off" inputmode="numeric"/>
             </div>
             <div class="stack" style="align-self:end">
               <span class="label">Storage</span>
               <label class="checkbox-field">
-                <input id="outOfWaterYearPlus" type="checkbox" name="outOfWaterYearPlus" value="yes" data-optional="true" />
+                <input id="outOfWaterYearPlus" type="checkbox" name="outOfWaterYearPlus" value="yes" data-optional="true"/>
                 <span>Out of the water for at least 1 year?</span>
               </label>
             </div>
@@ -256,11 +187,10 @@
         <!-- 3) Engine & fuel -->
         <div class="form-section wizard-step" data-step="3">
           <h2 class="section-title">Engine &amp; fuel</h2>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="engine">Engine model</label>
-              <input id="engine" type="text" name="engine" placeholder="e.g., Yamaha F300 / MerCruiser 5.7 MPI" autocomplete="off" />
+              <input id="engine" type="text" name="engine" placeholder="e.g., Yamaha F300 / MerCruiser 5.7 MPI" autocomplete="off"/>
             </div>
             <div class="stack">
               <label class="label" for="engineCount"># of engines</label>
@@ -270,14 +200,12 @@
               </select>
             </div>
           </div>
-
           <div class="row-2">
             <div class="stack">
               <label class="label" for="fuelType">Fuel type</label>
               <select id="fuelType" name="fuelType" autocomplete="off">
                 <option value="" disabled selected>Select fuel</option>
-                <option>Gasoline</option>
-                <option>Diesel</option>
+                <option>Gasoline</option><option>Diesel</option>
               </select>
             </div>
           </div>
@@ -286,28 +214,23 @@
         <!-- 4) Ownership & location -->
         <div class="form-section wizard-step" data-step="4">
           <h2 class="section-title">Ownership &amp; location</h2>
-
           <div class="row-3">
             <div class="stack">
               <label class="label" for="location">ZIP/City, State</label>
-              <input id="location" type="text" name="location" placeholder="e.g., 32210, Jacksonville FL" autocomplete="off" />
+              <input id="location" type="text" name="location" placeholder="e.g., 32210, Jacksonville FL" autocomplete="off"/>
             </div>
             <div class="stack">
               <label class="label" for="trailer">Trailer included?</label>
               <select id="trailer" name="trailer" autocomplete="off">
                 <option value="" disabled selected>Select</option>
-                <option>Yes</option>
-                <option>No</option>
+                <option>Yes</option><option>No</option>
               </select>
             </div>
             <div class="stack">
               <label class="label" for="titleStatus">Title status</label>
               <select id="titleStatus" name="titleStatus" autocomplete="off">
                 <option value="" disabled selected>Select</option>
-                <option>Clean</option>
-                <option>Loan/Lien</option>
-                <option>Bill of Sale only</option>
-                <option>Other</option>
+                <option>Clean</option><option>Loan/Lien</option><option>Bill of Sale only</option><option>Other</option>
               </select>
             </div>
           </div>
@@ -316,13 +239,11 @@
         <!-- 5) Notes (optional) -->
         <div class="form-section wizard-step" data-step="5">
           <h2 class="section-title">Notes (optional)</h2>
-
           <div class="stack">
             <label class="label" for="details">Important Details</label>
             <textarea id="details" name="details" rows="5" placeholder='e.g., "Soft spot near bow hatch"' data-optional="true" autocomplete="off"></textarea>
             <p class="fine">Add anything that could impact value: electronics issues, soft decks, recent maintenance, trailer condition, upholstery, etc.</p>
           </div>
-
           <div class="stack">
             <label class="label" for="aftermarket">Aftermarket Additions</label>
             <textarea id="aftermarket" name="aftermarket" rows="5" placeholder='e.g., "Bose audio upgrade"' data-optional="true" autocomplete="off"></textarea>
@@ -332,9 +253,7 @@
 
         <!-- Wizard nav -->
         <div class="wizard-nav">
-          <div class="left-actions">
-            <button id="prevBtn" type="button" class="btn btn-ghost">Back</button>
-          </div>
+          <div class="left-actions"><button id="prevBtn" type="button" class="btn btn-ghost">Back</button></div>
           <div class="right-actions">
             <a class="btn btn-ghost" href="index.html">Back to Home</a>
             <button id="nextBtn" type="button" class="btn btn-primary">Next</button>
@@ -343,13 +262,11 @@
       </form>
     </div>
 
-    <!-- Standalone FINISH panel -->
+    <!-- FINISH panel -->
     <div id="finishPanel" class="finish-panel" aria-live="polite">
       <h3>Ready to get your estimate?</h3>
       <p class="muted">We’ll analyze your details against recent sales and market trends.</p>
-      <div style="margin:6px 0 16px;">
-        <span class="pill" id="completedPill">0% complete</span>
-      </div>
+      <div style="margin:6px 0 16px;"><span class="pill" id="completedPill">0% complete</span></div>
       <div class="finish-actions">
         <button id="finishSubmitBtn" class="btn btn-primary">Get estimate</button>
         <button id="editBackBtn" class="btn btn-ghost">Keep editing</button>
@@ -369,7 +286,6 @@
       <h3 id="paywallTitle" class="modal-title">Choose your report</h3>
       <button id="closeModalBtn" class="modal-close" aria-label="Close">×</button>
     </div>
-
     <div class="option-grid">
       <div class="option-card">
         <div class="badge">Most affordable</div>
@@ -382,9 +298,7 @@
           <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
           <li><span class="icon-neg">–</span><span>Market trend chart not included</span></li>
         </ul>
-        <div class="get-btn-wrap">
-          <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
-        </div>
+        <div class="get-btn-wrap"><button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button></div>
       </div>
 
       <div class="option-card">
@@ -399,9 +313,7 @@
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
           <li><span class="icon-pos">✓</span><span><strong>Market Trend Chart included</strong></span></li>
         </ul>
-        <div class="get-btn-wrap">
-          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $9.99</button>
-        </div>
+        <div class="get-btn-wrap"><button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $9.99</button></div>
       </div>
     </div>
   </div>
@@ -410,18 +322,11 @@
 <footer class="site-footer">
   <div class="container footer-grid">
     <div>© <span id="year"></span> Hullify</div>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="estimate.html">Estimate</a>
-    </div>
+    <div class="footer-links"><a href="index.html">Home</a><a href="estimate.html">Estimate</a></div>
   </div>
 </footer>
 
-<noscript>
-  <div class="container" style="margin:16px auto;color:#9a2936;">
-    JavaScript is required to use the Hullify estimate form.
-  </div>
-</noscript>
+<noscript><div class="container" style="margin:16px auto;color:#9a2936;">JavaScript is required to use the Hullify estimate form.</div></noscript>
 
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
@@ -430,20 +335,20 @@
   const PLAN_REVEAL = "reveal_199";
   const PLAN_PDF    = "pdf_1900";
 
-  const STORAGE_KEY        = "hullify:payload:v1";       // localStorage (payload)
-  const RETURN_INTENT_KEY  = "hullify:return_intent:v1"; // sessionStorage (plan + ts)
-  const STORAGE_TTL_MS     = 2 * 60 * 60 * 1000;         // 2h
+  const STORAGE_KEY       = "hullify:payload:v1";       // localStorage
+  const RETURN_INTENT_KEY = "hullify:return_intent:v1"; // sessionStorage
+  const STORAGE_TTL_MS    = 2 * 60 * 60 * 1000; // 2h
 
   const form = document.getElementById("fullEstimateForm");
-  form.setAttribute("autocomplete", "off");
+  form.setAttribute("autocomplete","off");
 
   function safeLS(fn, fallback=null){ try{ return fn(); } catch { return fallback; } }
 
-  function savePayload() {
+  function savePayload(){
     const data = Object.fromEntries(new FormData(form).entries());
     safeLS(()=>localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data })));
   }
-  function loadSaved() {
+  function loadSaved(){
     return safeLS(()=>{
       const raw = localStorage.getItem(STORAGE_KEY);
       if(!raw) return null;
@@ -455,18 +360,12 @@
   }
   function clearSaved(){ safeLS(()=>localStorage.removeItem(STORAGE_KEY)); }
 
-  function setReturnIntent(plan){
-    const val = { plan, t: Date.now() };
-    safeLS(()=>sessionStorage.setItem(RETURN_INTENT_KEY, JSON.stringify(val)));
-  }
+  function setReturnIntent(plan){ safeLS(()=>sessionStorage.setItem(RETURN_INTENT_KEY, JSON.stringify({ plan, t: Date.now() }))); }
   function consumeReturnIntent(){
-    const obj = safeLS(()=>{
-      const raw = sessionStorage.getItem(RETURN_INTENT_KEY);
-      if(!raw) return null;
-      sessionStorage.removeItem(RETURN_INTENT_KEY);
-      return JSON.parse(raw);
-    }, null);
-    return obj;
+    const raw = safeLS(()=>sessionStorage.getItem(RETURN_INTENT_KEY), null);
+    if(!raw) return null;
+    safeLS(()=>sessionStorage.removeItem(RETURN_INTENT_KEY));
+    try { return JSON.parse(raw); } catch { return null; }
   }
 
   function restoreForm(payload){
@@ -475,16 +374,13 @@
       if(!el.name) return;
       const v = payload[el.name];
       if(v === undefined) return;
-      if(el.type === "checkbox"){
-        el.checked = v === "yes" || v === "on" || v === true || v === "true";
-      } else {
-        el.value = v;
-      }
+      if(el.type === "checkbox"){ el.checked = v === "yes" || v === "on" || v === true || v === "true"; }
+      else { el.value = v; }
     });
     updateProgress();
   }
 
-  /* -------------------------------- progress -------------------------------- */
+  /* ------------------------------- progress ------------------------------- */
   const progressFill = document.getElementById("progressFill");
   const progressPct  = document.getElementById("progressPct");
   const completedPill= document.getElementById("completedPill");
@@ -529,32 +425,22 @@
     steps[i].scrollIntoView({behavior:"smooth", block:"start"});
   }
   function stepIsValid(i){
-    const requiredFields = Array.from(steps[i].querySelectorAll("[required]"));
-    for(const el of requiredFields){
-      if(!el.checkValidity()){ el.reportValidity(); return false; }
-    }
+    const req = Array.from(steps[i].querySelectorAll("[required]"));
+    for(const el of req){ if(!el.checkValidity()){ el.reportValidity(); return false; } }
     return true;
   }
   prevBtn.addEventListener("click", ()=>{ if(currentStep>0){ currentStep--; showStep(currentStep); }});
   nextBtn.addEventListener("click", ()=>{
     if(!stepIsValid(currentStep)) return;
-    if(currentStep < steps.length-1){ currentStep++; showStep(currentStep); }
+    if(currentStep < steps.length - 1){ currentStep++; showStep(currentStep); }
     else { enterFinishOnly(); }
   });
-  function enterFinishOnly(){
-    document.body.classList.add("finish-only");
-    finishPanel.classList.remove("hidden");
-    finishPanel.scrollIntoView({behavior:"smooth", block:"center"});
-  }
-  function exitFinishOnly(){
-    document.body.classList.remove("finish-only");
-    currentStep = steps.length-1;
-    showStep(currentStep);
-  }
+  function enterFinishOnly(){ document.body.classList.add("finish-only"); finishPanel.classList.remove("hidden"); finishPanel.scrollIntoView({behavior:"smooth", block:"center"}); }
+  function exitFinishOnly(){ document.body.classList.remove("finish-only"); currentStep = steps.length-1; showStep(currentStep); }
   editBackBtn.addEventListener("click", exitFinishOnly);
   showStep(currentStep);
 
-  /* ----------------------------- paywall modal ----------------------------- */
+  /* ----------------------------- paywall modal ---------------------------- */
   const paywallModal   = document.getElementById('paywallModal');
   const closeModalBtn  = document.getElementById('closeModalBtn');
   const chooseRevealBtn= document.getElementById('chooseRevealBtn');
@@ -584,8 +470,7 @@
 
   chooseRevealBtn.addEventListener('click', ()=>{
     if(USE_CHECKOUT){
-      savePayload();
-      setReturnIntent(PLAN_REVEAL);
+      savePayload(); setReturnIntent(PLAN_REVEAL);
       window.location = '/api/checkout?plan=' + PLAN_REVEAL;
       return;
     }
@@ -596,8 +481,7 @@
 
   choosePdfBtn.addEventListener('click', ()=>{
     if(USE_CHECKOUT){
-      savePayload();
-      setReturnIntent(PLAN_PDF);
+      savePayload(); setReturnIntent(PLAN_PDF);
       window.location = '/api/checkout?plan=' + PLAN_PDF;
       return;
     }
@@ -607,12 +491,8 @@
     requestEstimate(lastPayload);
   });
 
-  /* ------------------------------ results flow ------------------------------ */
-  function showDownloadBtn(show){
-    const btn = document.getElementById("downloadPdfBtn");
-    if(!btn) return;
-    btn.classList.toggle("hidden", !show);
-  }
+  /* ------------------------------ result flow ----------------------------- */
+  function showDownloadBtn(show){ const btn = document.getElementById("downloadPdfBtn"); if(btn) btn.classList.toggle("hidden", !show); }
 
   async function requestEstimate(payload){
     finishPanel.classList.add("hidden");
@@ -624,11 +504,15 @@
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
     try{
-      const res = await fetch("/estimate", {
+      const res = await fetch("/api/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload || {})
       });
+      if(!res.ok){
+        const txt = await res.text().catch(()=> "");
+        throw new Error(`Estimate ${res.status}: ${txt}`);
+      }
       const data = await res.json();
 
       const nameLine = `${(payload.make||"").trim()} ${(payload.model||"").trim()}`.trim();
@@ -650,7 +534,7 @@
         </div>
       `;
 
-      // payload no longer needed after rendering
+      // we no longer need saved payload once results are shown
       clearSaved();
 
       const dl = document.getElementById("downloadPdfBtn");
@@ -665,7 +549,10 @@
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ ...(lastPayload||payload||{}), includeTrend: true })
             });
-            if(!pdfRes.ok) throw new Error("PDF failed");
+            if(!pdfRes.ok){
+              const t = await pdfRes.text().catch(()=> "");
+              throw new Error(`PDF ${pdfRes.status}: ${t}`);
+            }
             const blob = await pdfRes.blob();
             const url  = URL.createObjectURL(blob);
             const a = document.createElement("a");
@@ -673,12 +560,13 @@
             a.download = `Hullify_Valuation_${(payload.make||"Boat").replace(/\s+/g,"_").slice(0,32)}_${payload.year||""}.pdf`;
             document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
           } catch(e){ alert("Could not download PDF. Please try again."); }
-          finally{ dl.disabled=false; dl.textContent=prev; }
+          finally{ dl.disabled = false; dl.textContent = prev; }
         };
       }
 
       resultBox.scrollIntoView({ behavior:"smooth", block:"center" });
-    } catch{
+    } catch(err){
+      console.error(err);
       document.body.classList.remove("results-only");
       document.body.classList.add("finish-only");
       finishPanel.classList.remove("hidden");
@@ -689,26 +577,20 @@
 
   // Edit details from results
   document.addEventListener("click", (e)=>{
-    const link = e.target.closest('a#editDetailsLink');
-    if(!link) return;
-    e.preventDefault();
-    document.body.classList.remove("results-only");
-    currentStep = steps.length - 1;
-    showStep(currentStep);
+    const link = e.target.closest('a#editDetailsLink'); if(!link) return;
+    e.preventDefault(); document.body.classList.remove("results-only");
+    currentStep = steps.length - 1; showStep(currentStep);
     document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
 
-  /* ----------------------------- bootstrap return ----------------------------- */
+  /* --------------------------- bootstrap (return) --------------------------- */
   (function bootstrap(){
-    // disable browser autofill styling/behavior
     form.querySelectorAll("input, select, textarea").forEach(el=>el.setAttribute("autocomplete","off"));
 
     const params  = new URLSearchParams(location.search);
     const success = params.get("success") === "1";
-    const planQP  = params.get("plan");     // may be null if success URL didn’t include params
-
-    // If success URL had no params, use the stored return intent (sessionStorage)
-    const intent  = success ? null : consumeReturnIntent(); // only consume when not explicitly successful (avoid double)
+    const planQP  = params.get("plan");
+    const intent  = success ? null : consumeReturnIntent();
     const plan    = (planQP || (intent && intent.plan)) || null;
 
     const saved   = loadSaved();
@@ -717,22 +599,16 @@
       restoreForm(saved);
       lastPayload = saved;
       allowDownloadPdf = (plan === PLAN_PDF);
-      // Clean URL early to prevent re-trigger on refresh
-      history.replaceState(null, "", location.pathname);
+      history.replaceState(null, "", location.pathname); // clean URL
       requestEstimate(saved);
       return;
     }
 
-    // Fresh visit (no success/intent or no saved payload): start clean
+    // fresh visit
     form.reset();
-    form.querySelectorAll("input, select, textarea").forEach(el=>{
-      if(el.type === "checkbox") el.checked = false; else el.value = "";
-    });
+    form.querySelectorAll("input, select, textarea").forEach(el=>{ if(el.type==="checkbox") el.checked=false; else el.value=""; });
     updateProgress();
   })();
 </script>
-
-
-  
 </body>
 </html>
