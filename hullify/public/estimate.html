@@ -36,6 +36,11 @@
     .finish-panel .muted{margin:0 0 16px}
     .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
+
+    /* Hide everything except results when we're in results-only mode */
+    .results-only .card.big,
+    .results-only .progress-wrap,
+    .results-only #finishPanel{display:none}
     /* Finish-only hides wizard+progress for a clean screen */
     .finish-only .card.big, .finish-only .progress-wrap{display:none}
   </style>
@@ -495,6 +500,7 @@
     requestEstimate(); // proceed without checkout (dev mode)
   });
 
+  // UPDATED: when user chooses PDF, build & download directly (no Stripe in test)
   choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
       const plan = trendAddon.checked ? 'pdf_plus_3900' : 'pdf_1900';
@@ -502,7 +508,7 @@
       return;
     }
     closeModal();
-    requestEstimate(); // proceed without checkout (dev mode)
+    requestPdf(trendAddon.checked); // generate downloadable PDF
   });
 
   // ----- Results-only request flow -----
@@ -552,6 +558,66 @@
 
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
+    }
+  }
+
+  // NEW: Build & download the PDF via /api/pdf
+  async function requestPdf(includeTrend){
+    // Hide finish screen, show results-only layout with loading
+    finishPanel.classList.add("hidden");
+    document.body.classList.remove("finish-only");
+    document.body.classList.add("results-only");
+
+    resultBox.classList.remove("hidden");
+    resultBox.classList.add("loading");
+    resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Preparing your PDF…</p>";
+
+    const payload = Object.fromEntries(new FormData(form).entries());
+    payload.includeTrend = !!includeTrend;
+
+    try {
+      const res = await fetch("/api/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error("PDF generation failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const fname = `Hullify_${(payload.make || "Boat").replace(/\s+/g,"_")}_${payload.year || ""}.pdf`;
+
+      // Trigger download
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      // Light success state
+      resultBox.classList.remove("loading");
+      resultBox.innerHTML = `
+        <div class="estimate-result">
+          <h3>Sell-Ready PDF generated</h3>
+          <p class="muted">Your download should start automatically. Need changes? You can edit and generate again.</p>
+          <div class="actions">
+            <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
+          </div>
+        </div>
+      `;
+      resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+    } catch (err) {
+      // On error, revert to finish screen
+      document.body.classList.remove("results-only");
+      document.body.classList.add("finish-only");
+      finishPanel.classList.remove("hidden");
+
+      resultBox.classList.remove("loading");
+      resultBox.innerHTML = `<p class="error">Sorry, we couldn't generate the PDF. Please try again.</p>`;
+      console.error(err);
     }
   }
 
