@@ -1,5 +1,8 @@
 {
-  "version": 2,
-  "builds": [{ "src": "api/**/*.js", "use": "@vercel/node" }],
-  "rewrites": [{ "source": "/estimate", "destination": "/api/estimate.js" }]
+  "rewrites": [
+    { "source": "/estimate", "destination": "/api/estimate" }
+  ],
+  "redirects": [
+    { "source": "/", "destination": "/estimate.html", "permanent": false }
+  ]
 }
