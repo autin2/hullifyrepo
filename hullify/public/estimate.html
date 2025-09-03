@@ -6,8 +6,9 @@
   <title>Hullify — Detailed Estimate</title>
   <link rel="stylesheet" href="style.css"/>
 
-  <!-- Page-local helpers for the wizard + finish/results views -->
+  <!-- Page-local helpers for the wizard + finish/results + paywall modal -->
   <style>
+    /* ---------- Wizard layout helpers ---------- */
     .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
     .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
     .section-title{margin:0 0 8px;color:var(--primary);font-size:16px}
@@ -21,7 +22,6 @@
     .right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
-
     /* Standalone finish panel */
     #finishPanel{display:none}
     .finish-only #finishPanel{display:block}
@@ -37,48 +37,65 @@
     .finish-panel .muted{margin:0 0 16px}
     .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
-
-    /* Hide everything except results when we're in results-only mode */
-    .results-only .card.big,
-    .results-only .progress-wrap,
-    .results-only #finishPanel{display:none}
     /* Finish-only hides wizard+progress for a clean screen */
     .finish-only .card.big, .finish-only .progress-wrap{display:none}
 
-    /* Simple modal styles (if not already in your CSS) */
+    /* ---------- Paywall modal ---------- */
     .modal{position:fixed;inset:0;display:none}
     .modal.open{display:block}
-    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(11,27,43,.45)}
     .modal-box{
-      position:relative;max-width:980px;margin:40px auto;background:#fff;border-radius:16px;
-      border:1px solid var(--border);padding:16px 16px 22px
+      position:relative;max-width:920px;margin:40px auto;background:#fff;border-radius:16px;
+      border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.18);padding:18px 18px 22px;
     }
-    .modal-head{display:flex;align-items:center;justify-content:space-between}
-    .modal-title{margin:0;color:var(--primary)}
-    .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer}
-
-    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
-    @media (max-width:900px){.option-grid{grid-template-columns:1fr}}
-    .option-card{border:1px solid var(--border);border-radius:14px;padding:14px;position:relative}
-    .option-card .badge{
-      position:absolute;top:-10px;left:14px;background:var(--accent);border:1px solid #cfe2ff;
-      color:var(--primary);font-size:12px;font-weight:800;border-radius:999px;padding:6px 10px
+    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 12px}
+    .modal-title{margin:0;color:var(--primary);font-size:22px}
+    .modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;color:var(--muted)}
+    .option-grid{
+      display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;
+      padding:6px;
     }
-    .option-card h4{margin:6px 0 2px}
-    .option-card .sub{margin:0 0 10px;color:var(--muted)}
-    .price{font-weight:900;color:var(--primary);font-size:24px;margin:0 0 8px}
-    .feature-list{margin:8px 0 12px;padding-left:18px;color:var(--muted)}
+    @media (max-width:840px){.option-grid{grid-template-columns:1fr}}
+    .option-card{
+      display:flex;flex-direction:column;gap:10px;
+      background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;
+      min-height:440px; /* ensures consistent vertical rhythm */
+    }
+    .option-card h4{margin:0;color:var(--dark);font-size:18px}
+    .option-card .sub{color:var(--muted);margin:2px 0 8px}
+    .badge{
+      align-self:flex-start;background:#eaf2ff;border:1px solid #cfe2ff;color:#0b2e57;
+      font-weight:800;border-radius:999px;font-size:12px;padding:6px 10px;margin-bottom:4px
+    }
+    .badge.alt{background:#e9f8ef;border-color:#c9f0d9;color:#076a3a}
+    .sell-boost{
+      background:#e9f8ef;border:1px solid #c9f0d9;color:#076a3a;
+      border-radius:12px;padding:8px 10px;font-weight:700;font-size:13px
+    }
+    .price{font-size:26px;font-weight:800;color:var(--ink)}
     .addon-row{
       display:flex;align-items:center;justify-content:space-between;
-      padding:10px;border:1px dashed var(--border);border-radius:10px;margin-bottom:10px
+      background:#fbfdff;border:1px dashed var(--border);border-radius:12px;padding:10px 12px;margin:2px 0 6px
     }
+    .feature-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;flex:1}
+    .feature-list li{display:flex;gap:8px;align-items:flex-start;color:var(--muted);font-size:14px}
+    .icon-pos{color:#17a352;font-weight:900}
+    .icon-neg{color:#c33;font-weight:900}
+    /* Put CTA at the bottom on both cards */
+    .cta-row{margin-top:auto}
+    .btn.full{width:100%}
+
+    /* iOS-like switch */
     .switch{position:relative;width:46px;height:26px;display:inline-block}
     .switch input{display:none}
-    .slider{position:absolute;inset:0;background:#e8eef8;border-radius:999px;cursor:pointer;transition:.2s}
-    .slider:before{
-      content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:999px;transition:.2s;border:1px solid var(--border)
+    .slider{
+      position:absolute;cursor:pointer;inset:0;background:#dbe5f2;border-radius:999px;transition:all .2s ease
     }
-    .switch input:checked + .slider{background:#bcd3ef}
+    .slider:before{
+      content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:all .2s ease;
+      box-shadow:0 1px 3px rgba(0,0,0,.25)
+    }
+    .switch input:checked + .slider{background:#0b2e57}
     .switch input:checked + .slider:before{transform:translateX(20px)}
   </style>
 </head>
@@ -347,21 +364,26 @@
         <h4>Reveal Estimate</h4>
         <p class="sub">Instant value, range, and confidence on this page.</p>
         <div class="price">$1.99</div>
+
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Instant reveal on this page</span></li>
           <li><span class="icon-pos">✓</span><span>Value, range &amp; confidence score</span></li>
           <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
           <li><span class="icon-neg">–</span><span>No market trend chart</span></li>
         </ul>
-        <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+
+        <div class="cta-row">
+          <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+        </div>
       </div>
 
       <!-- Sell-Ready PDF -->
       <div class="option-card">
-        <div class="badge">Best for selling</div>
+        <div class="badge alt">Best for selling</div>
         <h4>Sell-Ready PDF</h4>
         <p class="sub">Branded report to attach to your listing.</p>
-        <div class="price" id="pdfPriceText">$19</div>
+        <div class="sell-boost">⚡ Sellers report up to <strong>50% faster sales</strong></div>
+        <div class="price" id="pdfPriceText" style="margin-top:6px">$19</div>
 
         <div class="addon-row">
           <label for="trendAddon">Add Market Trend Chart <span class="muted">(+$20)</span></label>
@@ -378,7 +400,10 @@
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
           <li><span class="icon-pos">✓</span><span>Optional Market Trend Chart when toggled</span></li>
         </ul>
-        <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+
+        <div class="cta-row">
+          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+        </div>
       </div>
     </div>
   </div>
@@ -526,7 +551,7 @@
   closeModalBtn.addEventListener('click', closeModal);
 
   // ---- Checkout/estimate actions ----
-  const USE_CHECKOUT = false; // set to true when you wire Stripe
+  const USE_CHECKOUT = false; // dev: bypass Stripe
 
   chooseRevealBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
@@ -537,12 +562,6 @@
     requestEstimate(); // proceed without checkout (dev mode)
   });
 
-  // PDF flow: show value on page, build PDF in background, show "Download" when ready
-  let preparedPdfUrl = null;
-  function revokePdfUrl(){
-    if (preparedPdfUrl) { URL.revokeObjectURL(preparedPdfUrl); preparedPdfUrl = null; }
-  }
-
   choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
       const plan = trendAddon.checked ? 'pdf_plus_3900' : 'pdf_1900';
@@ -550,13 +569,12 @@
       return;
     }
     closeModal();
-    requestPdf(trendAddon.checked);
+    requestEstimate(); // proceed without checkout (dev mode)
   });
 
-  // ----- Reveal (estimate only) -----
+  // ----- Results-only request flow -----
   async function requestEstimate(){
     // Hide finish screen, show results-only layout
-    revokePdfUrl();
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
@@ -604,89 +622,6 @@
     }
   }
 
-  // ----- PDF flow (estimate + prepare download) -----
-  async function requestPdf(includeTrend){
-    revokePdfUrl();
-
-    // Phase 1: Reveal the value on page (same UI as reveal)
-    finishPanel.classList.add("hidden");
-    document.body.classList.remove("finish-only");
-    document.body.classList.add("results-only");
-
-    resultBox.classList.remove("hidden");
-    resultBox.classList.add("loading");
-    resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
-
-    const payload = Object.fromEntries(new FormData(form).entries());
-
-    try {
-      // 1) get estimate so we can show it immediately
-      const resEstimate = await fetch("/estimate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      const data = await resEstimate.json();
-
-      // Render the estimate + disabled download button
-      resultBox.classList.remove("loading");
-      resultBox.innerHTML = `
-        <div class="estimate-result">
-          <h3>Your Estimated Value</h3>
-          <p class="muted">
-            ${(payload.make||"").trim()} ${(payload.model||"").trim()} • ${payload.year||"—"} • ${payload.length||"—"} ft
-          </p>
-          <div class="estimate-pill">${data.estimate || "$—"}</div>
-          ${data.range ? `<p class="fine">Range: ${data.range.low || "$—"} – ${data.range.high || "$—"}</p>` : ""}
-          ${data.confidence ? `<p class="fine">Confidence: ${data.confidence}</p>` : ""}
-          ${data.rationale ? `<p class="fine">Why: ${data.rationale}</p>` : ""}
-          <div class="actions">
-            <button id="downloadPdfBtn" class="btn btn-primary" disabled>Preparing PDF…</button>
-            <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
-          </div>
-        </div>
-      `;
-      resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
-
-      // 2) build the PDF in background
-      payload.includeTrend = !!includeTrend;
-      const resPdf = await fetch("/api/pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-      if (!resPdf.ok) throw new Error("PDF generation failed");
-
-      const blob = await resPdf.blob();
-      preparedPdfUrl = URL.createObjectURL(blob);
-
-      // Enable the button
-      const btn = document.getElementById("downloadPdfBtn");
-      btn.disabled = false;
-      btn.textContent = "Download Sell-Ready PDF";
-      btn.addEventListener("click", () => {
-        if (!preparedPdfUrl) return;
-        const fname = `Hullify_${(payload.make||"Boat").replace(/\s+/g,"_")}_${payload.year || ""}.pdf`;
-        const a = document.createElement("a");
-        a.href = preparedPdfUrl;
-        a.download = fname;
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      });
-
-    } catch (err) {
-      // On error, revert to finish screen
-      document.body.classList.remove("results-only");
-      document.body.classList.add("finish-only");
-      finishPanel.classList.remove("hidden");
-
-      resultBox.classList.remove("loading");
-      resultBox.innerHTML = `<p class="error">Sorry, we couldn't generate the PDF. Please try again.</p>`;
-      console.error(err);
-    }
-  }
-
   // Edit details from results
   document.addEventListener("click", (e) => {
     const link = e.target.closest('a#editDetailsLink');
@@ -697,9 +632,6 @@
     showStep(currentStep);
     document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
-
-  // Clean up object URL if navigating away
-  window.addEventListener("beforeunload", () => { if (preparedPdfUrl) URL.revokeObjectURL(preparedPdfUrl); });
 </script>
 </body>
 </html>
