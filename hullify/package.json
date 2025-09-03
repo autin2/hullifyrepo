@@ -1,10 +1,12 @@
-
 {
   "name": "hullify",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "engines": { "node": ">=18" },
   "dependencies": {
     "openai": "^5.18.1",
-    "pdfkit": "^0.13.0"
+    "pdfkit": "^0.13.0",
+    "stripe": "^16.6.0"
   }
 }
