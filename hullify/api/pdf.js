@@ -138,12 +138,7 @@ function textBlock(doc, text, x, y, width, opts = {}) {
 
 function drawComps(doc, comps, x, y, width, margins) {
   const rowH = 16;
-  const cols = {
-    title: x,
-    yl: x + 230,
-    price: x + 320,
-    loc: x + 400,
-  };
+  const cols = { title: x, yl: x + 230, price: x + 320, loc: x + 400 };
 
   // header
   doc.fontSize(10).fillColor(COLORS.muted);
@@ -151,12 +146,7 @@ function drawComps(doc, comps, x, y, width, margins) {
   doc.text("Year/Len", cols.yl, y);
   doc.text("Price", cols.price, y);
   doc.text("Location", cols.loc, y);
-  doc
-    .moveTo(x, y + 12)
-    .lineTo(x + width, y + 12)
-    .strokeColor(COLORS.border)
-    .lineWidth(1)
-    .stroke();
+  doc.moveTo(x, y + 12).lineTo(x + width, y + 12).strokeColor(COLORS.border).lineWidth(1).stroke();
   y += 16;
 
   comps.forEach((c) => {
@@ -171,12 +161,7 @@ function drawComps(doc, comps, x, y, width, margins) {
       doc.text("Year/Len", cols.yl, y);
       doc.text("Price", cols.price, y);
       doc.text("Location", cols.loc, y);
-      doc
-        .moveTo(x, y + 12)
-        .lineTo(x + width, y + 12)
-        .strokeColor(COLORS.border)
-        .lineWidth(1)
-        .stroke();
+      doc.moveTo(x, y + 12).lineTo(x + width, y + 12).strokeColor(COLORS.border).lineWidth(1).stroke();
       y += 16;
     }
 
@@ -208,10 +193,9 @@ async function buildPdf(payload, valuation, includeTrend) {
     // Title + timestamp (fixed positions)
     doc.fontSize(18).fillColor(COLORS.primary).text("Hullify — Verified Valuation", margins.left, y);
     y += 22;
-    doc
-      .fontSize(9)
-      .fillColor(COLORS.muted)
+    doc.fontSize(9).fillColor(COLORS.muted)
       .text(`Verified by Hullify.net • ${new Date().toLocaleString()}`, margins.left, y);
+
     // stamp top-right
     drawStamp(doc, pageW - margins.right - 34, margins.top + 12);
 
@@ -219,53 +203,27 @@ async function buildPdf(payload, valuation, includeTrend) {
 
     // Boat meta centered
     const boatLine = `${payload.make || ""} ${payload.model || ""}`.trim() || "Boat";
-    const metaLine = `${payload.year || "—"} • ${payload.length || "—"} ft • ${
-      payload.vesselClass || "—"
-    } • ${payload.hullMaterial || "—"}`;
+    const metaLine = `${payload.year || "—"} • ${payload.length || "—"} ft • ${payload.vesselClass || "—"} • ${payload.hullMaterial || "—"}`;
 
-    doc.fontSize(14).fillColor(COLORS.dark).text(boatLine, margins.left, y, {
-      width: usableW,
-      align: "center",
-    });
+    doc.fontSize(14).fillColor(COLORS.dark).text(boatLine, margins.left, y, { width: usableW, align: "center" });
     y += 18;
-    doc.fontSize(10).fillColor(COLORS.muted).text(metaLine, margins.left, y, {
-      width: usableW,
-      align: "center",
-    });
+    doc.fontSize(10).fillColor(COLORS.muted).text(metaLine, margins.left, y, { width: usableW, align: "center" });
     y += 22;
 
     // Value card (well below stamp)
-    const cardW = 420;
-    const cardH = 110;
+    const cardW = 420, cardH = 110;
     const cardX = margins.left + (usableW - cardW) / 2;
     const cardY = y;
-
-    doc
-      .roundedRect(cardX, cardY, cardW, cardH, 12)
-      .lineWidth(1)
-      .strokeColor(COLORS.border)
-      .stroke();
+    doc.roundedRect(cardX, cardY, cardW, cardH, 12).lineWidth(1).strokeColor(COLORS.border).stroke();
     doc.fontSize(11).fillColor(COLORS.muted).text("Estimated Value", cardX + 16, cardY + 14);
     doc.fontSize(32).fillColor(COLORS.primary).text(valuation.estimate || "$—", cardX + 16, cardY + 40);
-    doc
-      .fontSize(10)
-      .fillColor(COLORS.muted)
-      .text(
-        `Range: ${valuation.range?.low || "$—"} – ${valuation.range?.high || "$—"}   •   Confidence: ${
-          valuation.confidence || "—"
-        }`,
-        cardX + 16,
-        cardY + 78
-      );
+    doc.fontSize(10).fillColor(COLORS.muted)
+      .text(`Range: ${valuation.range?.low || "$—"} – ${valuation.range?.high || "$—"}   •   Confidence: ${valuation.confidence || "—"}`, cardX + 16, cardY + 78);
 
     y = cardY + cardH + 18;
-    y = textBlock(
-      doc,
+    y = textBlock(doc,
       "This report has been digitally verified by Hullify and supports a fair listing price based on size, age, condition, and local comparables.",
-      margins.left,
-      y,
-      usableW,
-      { size: 10, color: COLORS.muted, align: "center" }
+      margins.left, y, usableW, { size: 10, color: COLORS.muted, align: "center" }
     );
     doc.addPage();
 
@@ -274,22 +232,18 @@ async function buildPdf(payload, valuation, includeTrend) {
 
     // Why this price
     y = textBlock(doc, "Why this price", margins.left, y, usableW, { size: 14, color: COLORS.dark }) + 4;
-    y = textBlock(doc, valuation.rationale || "—", margins.left, y, usableW, {
-      size: 10,
-      color: COLORS.muted,
-    }) + 12;
+    y = textBlock(doc, valuation.rationale || "—", margins.left, y, usableW, { size: 10, color: COLORS.muted }) + 12;
 
     // two columns for details
     const colW = (usableW - 28) / 2;
     const leftX = margins.left;
     const rightX = margins.left + colW + 28;
 
-    let yL = y;
-    let yR = y;
+    let yL = y, yR = y;
 
     // Boat details (left)
     yL = textBlock(doc, "Boat Details", leftX, yL, colW, { size: 12, color: COLORS.dark }) + 4;
-    const boatLines = [
+    [
       ["Condition", payload.condition || "—"],
       ["Runs", payload.runs || "—"],
       ["Engine", payload.engine || "—"],
@@ -297,32 +251,20 @@ async function buildPdf(payload, valuation, includeTrend) {
       ["Fuel", payload.fuelType || "—"],
       ["Engines", payload.engineCount || "—"],
       ["Storage", payload.outOfWaterYearPlus ? "Out of water ≥1yr" : "—"],
-    ];
-    boatLines.forEach(([k, v]) => {
-      yL = textBlock(doc, `${k}: ${v}`, leftX, yL, colW, { size: 10, color: COLORS.muted });
-    });
+    ].forEach(([k, v]) => { yL = textBlock(doc, `${k}: ${v}`, leftX, yL, colW, { size: 10, color: COLORS.muted }); });
 
     // Ownership (right)
-    yR = textBlock(doc, "Ownership & Location", rightX, yR, colW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 4;
-    const ownLines = [
+    yR = textBlock(doc, "Ownership & Location", rightX, yR, colW, { size: 12, color: COLORS.dark }) + 4;
+    [
       ["Location", payload.location || "—"],
       ["Trailer", payload.trailer || "—"],
       ["Title", payload.titleStatus || "—"],
-    ];
-    ownLines.forEach(([k, v]) => {
-      yR = textBlock(doc, `${k}: ${v}`, rightX, yR, colW, { size: 10, color: COLORS.muted });
-    });
+    ].forEach(([k, v]) => { yR = textBlock(doc, `${k}: ${v}`, rightX, yR, colW, { size: 10, color: COLORS.muted }); });
 
     y = Math.max(yL, yR) + 14;
 
-    // Comps table (auto-flows to next pages if needed)
-    y = textBlock(doc, "Recent Comparable Listings/Sales", margins.left, y, usableW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 4;
+    // Comps table (auto-flows)
+    y = textBlock(doc, "Recent Comparable Listings/Sales", margins.left, y, usableW, { size: 12, color: COLORS.dark }) + 4;
     doc.y = y;
     y = drawComps(doc, (valuation.comps || []).slice(0, 30), margins.left, doc.y, usableW, margins);
 
@@ -331,10 +273,7 @@ async function buildPdf(payload, valuation, includeTrend) {
     y = margins.top;
 
     if (includeTrend && Array.isArray(valuation.trend) && valuation.trend.length >= 6) {
-      y = textBlock(doc, "Market Trend (last 12 months)", margins.left, y, usableW, {
-        size: 12,
-        color: COLORS.dark,
-      }) + 6;
+      y = textBlock(doc, "Market Trend (last 12 months)", margins.left, y, usableW, { size: 12, color: COLORS.dark }) + 6;
 
       const chart = { x: margins.left, y, w: usableW, h: 190 };
       const prices = valuation.trend.map((t) => Number(t.price));
@@ -352,8 +291,7 @@ async function buildPdf(payload, valuation, includeTrend) {
       valuation.trend.forEach((p, i) => {
         const x = chart.x + (i / (valuation.trend.length - 1)) * chart.w;
         const yVal = chart.y + chart.h - ((Number(p.price) - yMin) / (yMax - yMin)) * chart.h;
-        if (i === 0) doc.moveTo(x, yVal);
-        else doc.lineTo(x, yVal);
+        if (i === 0) doc.moveTo(x, yVal); else doc.lineTo(x, yVal);
       });
       doc.stroke();
 
@@ -375,60 +313,32 @@ async function buildPdf(payload, valuation, includeTrend) {
     const cLeft = margins.left;
     const cRight = margins.left + copyColW + 34;
 
-    let yLeft = y;
-    let yRight = y;
+    let yLeft = y, yRight = y;
 
     // Listing copy
-    yLeft = textBlock(doc, "Listing Copy", cLeft, yLeft, copyColW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 2;
-    yLeft = textBlock(doc, valuation.listingTitle || "—", cLeft, yLeft, copyColW, {
-      size: 11,
-      color: COLORS.primary,
-    }) + 2;
-    yLeft = textBlock(doc, valuation.listingDescription || "—", cLeft, yLeft, copyColW, {
-      size: 10,
-      color: COLORS.dark,
-    });
+    yLeft = textBlock(doc, "Listing Copy", cLeft, yLeft, copyColW, { size: 12, color: COLORS.dark }) + 2;
+    yLeft = textBlock(doc, valuation.listingTitle || "—", cLeft, yLeft, copyColW, { size: 11, color: COLORS.primary }) + 2;
+    yLeft = textBlock(doc, valuation.listingDescription || "—", cLeft, yLeft, copyColW, { size: 10, color: COLORS.dark });
 
     // Negotiation bullets
-    yRight = textBlock(doc, "Negotiation Bullets", cRight, yRight, copyColW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 2;
+    yRight = textBlock(doc, "Negotiation Bullets", cRight, yRight, copyColW, { size: 12, color: COLORS.dark }) + 2;
     (valuation.negotiationBullets || []).forEach((b) => {
-      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, {
-        size: 10,
-        color: COLORS.muted,
-      });
+      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, { size: 10, color: COLORS.muted });
     });
 
     // Align both, then next left block
     y = Math.max(yLeft, yRight) + 12;
 
     // Prep checklist
-    yLeft = textBlock(doc, "Prep Checklist", cLeft, y, copyColW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 2;
+    yLeft = textBlock(doc, "Prep Checklist", cLeft, y, copyColW, { size: 12, color: COLORS.dark }) + 2;
     (valuation.prepChecklist || []).forEach((b) => {
-      yLeft = textBlock(doc, `□ ${b}`, cLeft, yLeft, copyColW, {
-        size: 10,
-        color: COLORS.muted,
-      });
+      yLeft = textBlock(doc, `□ ${b}`, cLeft, yLeft, copyColW, { size: 10, color: COLORS.muted });
     });
 
     // Upgrade tips (right)
-    yRight = textBlock(doc, "Upgrade ROI Tips", cRight, y, copyColW, {
-      size: 12,
-      color: COLORS.dark,
-    }) + 2;
+    yRight = textBlock(doc, "Upgrade ROI Tips", cRight, y, copyColW, { size: 12, color: COLORS.dark }) + 2;
     (valuation.upgradeTips || []).forEach((b) => {
-      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, {
-        size: 10,
-        color: COLORS.muted,
-      });
+      yRight = textBlock(doc, `• ${b}`, cRight, yRight, copyColW, { size: 10, color: COLORS.muted });
     });
 
     y = Math.max(yLeft, yRight) + 16;
@@ -437,10 +347,7 @@ async function buildPdf(payload, valuation, includeTrend) {
     textBlock(
       doc,
       "This is a non-binding estimate based on market trends and comparable sales. Not a marine survey or legal appraisal.",
-      margins.left,
-      y,
-      usableW,
-      { size: 8, color: COLORS.muted }
+      margins.left, y, usableW, { size: 8, color: COLORS.muted }
     );
 
     doc.end();
@@ -453,17 +360,16 @@ export default async function handler(req, res) {
 
   try {
     const payload = req.body || {};
-    const includeTrend = !!payload.includeTrend;
+    const includeTrend = payload.includeTrend !== false; // default true
 
     const valuation = await getValuation(payload, includeTrend);
     const pdfBuffer = await buildPdf(payload, valuation, includeTrend);
 
-    const fname = `Hullify_Valuation_${(payload.make || "Boat")
-      .replace(/\s+/g, "_")
-      .slice(0, 32)}_${payload.year || ""}.pdf`;
+    const fname = `Hullify_Valuation_${(payload.make || "Boat").replace(/\s+/g, "_").slice(0, 32)}_${payload.year || ""}.pdf`;
 
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", `attachment; filename="${fname}"`);
+    res.setHeader("Cache-Control", "no-store");
     res.status(200).send(pdfBuffer);
   } catch (err) {
     console.error("pdf build error:", err);
