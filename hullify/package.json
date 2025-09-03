@@ -1,0 +1,8 @@
+{
+  "name": "hullify",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "openai": "^5.18.1"
+  }
+}
