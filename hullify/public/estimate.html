@@ -21,6 +21,7 @@
     .right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
+
     /* Standalone finish panel */
     #finishPanel{display:none}
     .finish-only #finishPanel{display:block}
@@ -43,6 +44,42 @@
     .results-only #finishPanel{display:none}
     /* Finish-only hides wizard+progress for a clean screen */
     .finish-only .card.big, .finish-only .progress-wrap{display:none}
+
+    /* Simple modal styles (if not already in your CSS) */
+    .modal{position:fixed;inset:0;display:none}
+    .modal.open{display:block}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.35)}
+    .modal-box{
+      position:relative;max-width:980px;margin:40px auto;background:#fff;border-radius:16px;
+      border:1px solid var(--border);padding:16px 16px 22px
+    }
+    .modal-head{display:flex;align-items:center;justify-content:space-between}
+    .modal-title{margin:0;color:var(--primary)}
+    .modal-close{background:transparent;border:0;font-size:24px;cursor:pointer}
+
+    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+    @media (max-width:900px){.option-grid{grid-template-columns:1fr}}
+    .option-card{border:1px solid var(--border);border-radius:14px;padding:14px;position:relative}
+    .option-card .badge{
+      position:absolute;top:-10px;left:14px;background:var(--accent);border:1px solid #cfe2ff;
+      color:var(--primary);font-size:12px;font-weight:800;border-radius:999px;padding:6px 10px
+    }
+    .option-card h4{margin:6px 0 2px}
+    .option-card .sub{margin:0 0 10px;color:var(--muted)}
+    .price{font-weight:900;color:var(--primary);font-size:24px;margin:0 0 8px}
+    .feature-list{margin:8px 0 12px;padding-left:18px;color:var(--muted)}
+    .addon-row{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px;border:1px dashed var(--border);border-radius:10px;margin-bottom:10px
+    }
+    .switch{position:relative;width:46px;height:26px;display:inline-block}
+    .switch input{display:none}
+    .slider{position:absolute;inset:0;background:#e8eef8;border-radius:999px;cursor:pointer;transition:.2s}
+    .slider:before{
+      content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:999px;transition:.2s;border:1px solid var(--border)
+    }
+    .switch input:checked + .slider{background:#bcd3ef}
+    .switch input:checked + .slider:before{transform:translateX(20px)}
   </style>
 </head>
 <body>
@@ -500,7 +537,12 @@
     requestEstimate(); // proceed without checkout (dev mode)
   });
 
-  // UPDATED: when user chooses PDF, build & download directly (no Stripe in test)
+  // PDF flow: show value on page, build PDF in background, show "Download" when ready
+  let preparedPdfUrl = null;
+  function revokePdfUrl(){
+    if (preparedPdfUrl) { URL.revokeObjectURL(preparedPdfUrl); preparedPdfUrl = null; }
+  }
+
   choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
       const plan = trendAddon.checked ? 'pdf_plus_3900' : 'pdf_1900';
@@ -508,12 +550,13 @@
       return;
     }
     closeModal();
-    requestPdf(trendAddon.checked); // generate downloadable PDF
+    requestPdf(trendAddon.checked);
   });
 
-  // ----- Results-only request flow -----
+  // ----- Reveal (estimate only) -----
   async function requestEstimate(){
     // Hide finish screen, show results-only layout
+    revokePdfUrl();
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
@@ -561,54 +604,77 @@
     }
   }
 
-  // NEW: Build & download the PDF via /api/pdf
+  // ----- PDF flow (estimate + prepare download) -----
   async function requestPdf(includeTrend){
-    // Hide finish screen, show results-only layout with loading
+    revokePdfUrl();
+
+    // Phase 1: Reveal the value on page (same UI as reveal)
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
 
     resultBox.classList.remove("hidden");
     resultBox.classList.add("loading");
-    resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Preparing your PDF…</p>";
+    resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
     const payload = Object.fromEntries(new FormData(form).entries());
-    payload.includeTrend = !!includeTrend;
 
     try {
-      const res = await fetch("/api/pdf", {
+      // 1) get estimate so we can show it immediately
+      const resEstimate = await fetch("/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+      const data = await resEstimate.json();
 
-      if (!res.ok) throw new Error("PDF generation failed");
-
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const fname = `Hullify_${(payload.make || "Boat").replace(/\s+/g,"_")}_${payload.year || ""}.pdf`;
-
-      // Trigger download
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = fname;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-
-      // Light success state
+      // Render the estimate + disabled download button
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `
         <div class="estimate-result">
-          <h3>Sell-Ready PDF generated</h3>
-          <p class="muted">Your download should start automatically. Need changes? You can edit and generate again.</p>
+          <h3>Your Estimated Value</h3>
+          <p class="muted">
+            ${(payload.make||"").trim()} ${(payload.model||"").trim()} • ${payload.year||"—"} • ${payload.length||"—"} ft
+          </p>
+          <div class="estimate-pill">${data.estimate || "$—"}</div>
+          ${data.range ? `<p class="fine">Range: ${data.range.low || "$—"} – ${data.range.high || "$—"}</p>` : ""}
+          ${data.confidence ? `<p class="fine">Confidence: ${data.confidence}</p>` : ""}
+          ${data.rationale ? `<p class="fine">Why: ${data.rationale}</p>` : ""}
           <div class="actions">
+            <button id="downloadPdfBtn" class="btn btn-primary" disabled>Preparing PDF…</button>
             <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
           </div>
         </div>
       `;
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      // 2) build the PDF in background
+      payload.includeTrend = !!includeTrend;
+      const resPdf = await fetch("/api/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      if (!resPdf.ok) throw new Error("PDF generation failed");
+
+      const blob = await resPdf.blob();
+      preparedPdfUrl = URL.createObjectURL(blob);
+
+      // Enable the button
+      const btn = document.getElementById("downloadPdfBtn");
+      btn.disabled = false;
+      btn.textContent = "Download Sell-Ready PDF";
+      btn.addEventListener("click", () => {
+        if (!preparedPdfUrl) return;
+        const fname = `Hullify_${(payload.make||"Boat").replace(/\s+/g,"_")}_${payload.year || ""}.pdf`;
+        const a = document.createElement("a");
+        a.href = preparedPdfUrl;
+        a.download = fname;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+
     } catch (err) {
       // On error, revert to finish screen
       document.body.classList.remove("results-only");
@@ -631,6 +697,9 @@
     showStep(currentStep);
     document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
+
+  // Clean up object URL if navigating away
+  window.addEventListener("beforeunload", () => { if (preparedPdfUrl) URL.revokeObjectURL(preparedPdfUrl); });
 </script>
 </body>
 </html>
