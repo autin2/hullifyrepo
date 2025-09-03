@@ -61,7 +61,7 @@
       background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;
       min-height:440px; /* ensures consistent vertical rhythm */
     }
-    .option-card h4{margin:0;color:var(--dark);font-size:18px}
+    .option-card h4{margin:0;color:var(--ink);font-size:18px}
     .option-card .sub{color:var(--muted);margin:2px 0 8px}
     .badge{
       align-self:flex-start;background:#eaf2ff;border:1px solid #cfe2ff;color:#0b2e57;
@@ -73,10 +73,6 @@
       border-radius:12px;padding:8px 10px;font-weight:700;font-size:13px
     }
     .price{font-size:26px;font-weight:800;color:var(--ink)}
-    .addon-row{
-      display:flex;align-items:center;justify-content:space-between;
-      background:#fbfdff;border:1px dashed var(--border);border-radius:12px;padding:10px 12px;margin:2px 0 6px
-    }
     .feature-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;flex:1}
     .feature-list li{display:flex;gap:8px;align-items:flex-start;color:var(--muted);font-size:14px}
     .icon-pos{color:#17a352;font-weight:900}
@@ -84,19 +80,6 @@
     /* Put CTA at the bottom on both cards */
     .cta-row{margin-top:auto}
     .btn.full{width:100%}
-
-    /* iOS-like switch */
-    .switch{position:relative;width:46px;height:26px;display:inline-block}
-    .switch input{display:none}
-    .slider{
-      position:absolute;cursor:pointer;inset:0;background:#dbe5f2;border-radius:999px;transition:all .2s ease
-    }
-    .slider:before{
-      content:"";position:absolute;height:20px;width:20px;left:3px;top:3px;background:#fff;border-radius:50%;transition:all .2s ease;
-      box-shadow:0 1px 3px rgba(0,0,0,.25)
-    }
-    .switch input:checked + .slider{background:#0b2e57}
-    .switch input:checked + .slider:before{transform:translateX(20px)}
   </style>
 </head>
 <body>
@@ -383,26 +366,18 @@
         <h4>Sell-Ready PDF</h4>
         <p class="sub">Branded report to attach to your listing.</p>
         <div class="sell-boost">⚡ Sellers report up to <strong>50% faster sales</strong></div>
-        <div class="price" id="pdfPriceText" style="margin-top:6px">$19</div>
-
-        <div class="addon-row">
-          <label for="trendAddon">Add Market Trend Chart <span class="muted">(+$20)</span></label>
-          <label class="switch">
-            <input type="checkbox" id="trendAddon" />
-            <span class="slider"></span>
-          </label>
-        </div>
+        <div class="price" style="margin-top:6px">$19.99</div>
 
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
           <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
+          <li><span class="icon-pos">✓</span><span>Market Trend Chart (included)</span></li>
           <li><span class="icon-pos">✓</span><span>Listing title/description template</span></li>
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
-          <li><span class="icon-pos">✓</span><span>Optional Market Trend Chart when toggled</span></li>
         </ul>
 
         <div class="cta-row">
-          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19.99</button>
         </div>
       </div>
     </div>
@@ -507,8 +482,6 @@
   const closeModalBtn = document.getElementById('closeModalBtn');
   const chooseRevealBtn = document.getElementById('chooseRevealBtn');
   const choosePdfBtn = document.getElementById('choosePdfBtn');
-  const trendAddon = document.getElementById('trendAddon');
-  const pdfPriceText = document.getElementById('pdfPriceText');
 
   function openModal(){
     paywallModal.classList.add('open');
@@ -518,15 +491,6 @@
     paywallModal.classList.remove('open');
     document.body.style.overflow = '';
   }
-
-  // price toggle for PDF card
-  function updatePdfCta(){
-    const plus = trendAddon.checked;
-    pdfPriceText.textContent = plus ? '$39' : '$19';
-    choosePdfBtn.textContent = plus ? 'Get PDF + Trend Chart for $39' : 'Get PDF for $19';
-  }
-  trendAddon.addEventListener('change', updatePdfCta);
-  updatePdfCta();
 
   // Intercept "Get estimate" -> show modal
   document.getElementById("finishSubmitBtn").addEventListener("click", () => {
@@ -559,21 +523,20 @@
       return;
     }
     closeModal();
-    requestEstimate(); // proceed without checkout (dev mode)
+    requestEstimate(); // proceed without checkout (dev)
   });
 
-  choosePdfBtn.addEventListener('click', () => {
+  choosePdfBtn.addEventListener('click', async () => {
     if (USE_CHECKOUT){
-      const plan = trendAddon.checked ? 'pdf_plus_3900' : 'pdf_1900';
-      window.location = `/checkout?plan=${plan}`;
+      window.location = '/checkout?plan=pdf_1999'; // example
       return;
     }
     closeModal();
-    requestEstimate(); // proceed without checkout (dev mode)
+    requestEstimate({ alsoMakePdf: true }); // dev: estimate + build PDF, then show download button
   });
 
-  // ----- Results-only request flow -----
-  async function requestEstimate(){
+  // ----- Results flow -----
+  async function requestEstimate(opts = {}){
     // Hide finish screen, show results-only layout
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
@@ -611,6 +574,10 @@
         </div>
       `;
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
+
+      if (opts.alsoMakePdf){
+        makePdf(payload, data);
+      }
     } catch (err) {
       // On error, revert to finish screen
       document.body.classList.remove("results-only");
@@ -619,6 +586,66 @@
 
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
+    }
+  }
+
+  // Generate PDF and append a download button (dev mode)
+  async function makePdf(payload, estimateData){
+    const prepId = "pdfPrepMsg";
+    const prep = document.createElement('p');
+    prep.id = prepId;
+    prep.className = 'fine';
+    prep.style.marginTop = '8px';
+    prep.textContent = 'Preparing your Sell-Ready PDF…';
+    resultBox.appendChild(prep);
+
+    try {
+      const res = await fetch("/pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          estimate: estimateData,
+          includeChart: true // always include chart now
+        })
+      });
+
+      let downloadUrl = null;
+
+      const ct = res.headers.get('content-type') || '';
+      if (ct.includes('application/pdf')) {
+        const blob = await res.blob();
+        downloadUrl = URL.createObjectURL(blob);
+      } else {
+        const json = await res.json().catch(()=>({}));
+        downloadUrl = json?.url || json?.pdfUrl || null;
+      }
+
+      document.getElementById(prepId)?.remove();
+
+      if (!downloadUrl) {
+        const errP = document.createElement('p');
+        errP.className = 'error';
+        errP.textContent = 'PDF was generated, but we could not find a download link.';
+        resultBox.appendChild(errP);
+        return;
+      }
+
+      const actions = resultBox.querySelector('.actions');
+      const dl = document.createElement('a');
+      dl.className = 'btn btn-primary';
+      dl.href = downloadUrl;
+      dl.target = '_blank';
+      dl.rel = 'noopener';
+      dl.download = 'Hullify-Sell-Ready-Valuation.pdf';
+      dl.textContent = 'Download Sell-Ready PDF';
+      actions?.append(dl);
+    } catch (e) {
+      document.getElementById(prepId)?.remove();
+      const errP = document.createElement('p');
+      errP.className = 'error';
+      errP.textContent = 'Could not generate the PDF. Please try again.';
+      resultBox.appendChild(errP);
     }
   }
 
