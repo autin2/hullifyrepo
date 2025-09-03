@@ -6,9 +6,8 @@
   <title>Hullify — Detailed Estimate</title>
   <link rel="stylesheet" href="style.css"/>
 
-  <!-- Page-local helpers for the wizard + finish/results + paywall modal -->
+  <!-- Page-local helpers for the wizard + finish/results views + modal -->
   <style>
-    /* ---------- Wizard layout helpers ---------- */
     .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
     .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
     .section-title{margin:0 0 8px;color:var(--primary);font-size:16px}
@@ -41,45 +40,50 @@
     .finish-only .card.big, .finish-only .progress-wrap{display:none}
 
     /* ---------- Paywall modal ---------- */
-    .modal{position:fixed;inset:0;display:none}
+    .modal{position:fixed;inset:0;display:none;z-index:1000}
     .modal.open{display:block}
-    .modal-backdrop{position:absolute;inset:0;background:rgba(11,27,43,.45)}
+    .modal-backdrop{position:absolute;inset:0;background:#0006;backdrop-filter:blur(2px)}
     .modal-box{
-      position:relative;max-width:920px;margin:40px auto;background:#fff;border-radius:16px;
-      border:1px solid var(--border);box-shadow:0 12px 40px rgba(0,0,0,.18);padding:18px 18px 22px;
+      position:relative;z-index:1;max-width:960px;margin:6vh auto;background:#fff;border-radius:16px;
+      border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.2);padding:20px;
     }
-    .modal-head{display:flex;align-items:center;justify-content:space-between;padding:4px 6px 12px}
-    .modal-title{margin:0;color:var(--primary);font-size:22px}
-    .modal-close{background:transparent;border:0;font-size:22px;cursor:pointer;color:var(--muted)}
-    .option-grid{
-      display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;
-      padding:6px;
-    }
-    @media (max-width:840px){.option-grid{grid-template-columns:1fr}}
+    .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+    .modal-title{margin:0;color:var(--primary)}
+    .modal-close{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
+    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    @media (max-width:900px){.option-grid{grid-template-columns:1fr}}
     .option-card{
-      display:flex;flex-direction:column;gap:10px;
-      background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;
-      min-height:440px; /* ensures consistent vertical rhythm */
+      position:relative;display:flex;flex-direction:column;gap:10px;
+      border:1px solid var(--border);border-radius:14px;padding:16px;background:#fff;
     }
-    .option-card h4{margin:0;color:var(--ink);font-size:18px}
-    .option-card .sub{color:var(--muted);margin:2px 0 8px}
-    .badge{
-      align-self:flex-start;background:#eaf2ff;border:1px solid #cfe2ff;color:#0b2e57;
-      font-weight:800;border-radius:999px;font-size:12px;padding:6px 10px;margin-bottom:4px
+    .option-card .badge{
+      position:absolute;top:10px;left:10px;
+      background:#e9f2ff;border:1px solid #cfe2ff;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700;color:var(--primary)
     }
-    .badge.alt{background:#e9f8ef;border-color:#c9f0d9;color:#076a3a}
-    .sell-boost{
-      background:#e9f8ef;border:1px solid #c9f0d9;color:#076a3a;
-      border-radius:12px;padding:8px 10px;font-weight:700;font-size:13px
+    .option-card h4{margin:18px 0 4px}
+    .option-card .sub{margin:0;color:var(--muted)}
+    .option-card .price{font-size:26px;font-weight:800;color:var(--primary);margin-top:2px}
+    .feature-list{list-style:none;padding:0;margin:6px 0 0}
+    .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--ink)}
+    .icon-pos{color:#1a7f37;font-weight:800}
+    .icon-neg{color:#9c2b2e;font-weight:800}
+    .option-card .btn{margin-top:auto} /* align CTAs across the two cards */
+
+    /* download bar beneath results */
+    #pdfBar{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
+
+    /* Input-like checkbox so it aligns with other fields */
+    .checkbox-field{
+      display:flex; align-items:center; gap:10px;
+      height:44px; padding:0 12px;
+      border:1px solid var(--border); border-radius:10px; background:#fff;
+      font-weight:600; color:var(--ink);
     }
-    .price{font-size:26px;font-weight:800;color:var(--ink)}
-    .feature-list{list-style:none;margin:4px 0 0;padding:0;display:flex;flex-direction:column;gap:6px;flex:1}
-    .feature-list li{display:flex;gap:8px;align-items:flex-start;color:var(--muted);font-size:14px}
-    .icon-pos{color:#17a352;font-weight:900}
-    .icon-neg{color:#c33;font-weight:900}
-    /* Put CTA at the bottom on both cards */
-    .cta-row{margin-top:auto}
-    .btn.full{width:100%}
+    .checkbox-field:hover{border-color:#bcd3ef; box-shadow:0 0 0 3px #e7f1ff}
+    .checkbox-field input[type="checkbox"]{
+      width:18px; height:18px; accent-color:var(--primary);
+      margin:0;
+    }
   </style>
 </head>
 <body>
@@ -328,6 +332,14 @@
 
     <!-- RESULT -->
     <div id="estimateResult" class="result hidden" style="margin-top:18px;"></div>
+
+    <!-- Download bar (shown after PDF is ready) -->
+    <div id="pdfBar" class="actions hidden">
+      <a id="downloadPdfBtn" class="btn btn-primary" href="#" download="Hullify-Sell-Ready-Valuation.pdf">
+        Download PDF
+      </a>
+      <a class="btn btn-ghost" href="#estimate-form">Edit details</a>
+    </div>
   </section>
 </main>
 
@@ -347,38 +359,29 @@
         <h4>Reveal Estimate</h4>
         <p class="sub">Instant value, range, and confidence on this page.</p>
         <div class="price">$1.99</div>
-
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Instant reveal on this page</span></li>
           <li><span class="icon-pos">✓</span><span>Value, range &amp; confidence score</span></li>
           <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
           <li><span class="icon-neg">–</span><span>No market trend chart</span></li>
         </ul>
-
-        <div class="cta-row">
-          <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
-        </div>
+        <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
       </div>
 
-      <!-- Sell-Ready PDF -->
+      <!-- Sell-Ready PDF (includes market trend by default) -->
       <div class="option-card">
-        <div class="badge alt">Best for selling</div>
+        <div class="badge">Best for selling</div>
         <h4>Sell-Ready PDF</h4>
-        <p class="sub">Branded report to attach to your listing.</p>
-        <div class="sell-boost">⚡ Sellers report up to <strong>50% faster sales</strong></div>
-        <div class="price" style="margin-top:6px">$19.99</div>
-
+        <p class="sub">Branded report + market trend chart. <strong>Boosts buyer interest ~50%</strong>.</p>
+        <div class="price">$19</div>
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
+          <li><span class="icon-pos">✓</span><span>Market Trend Chart included</span></li>
           <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
-          <li><span class="icon-pos">✓</span><span>Market Trend Chart (included)</span></li>
           <li><span class="icon-pos">✓</span><span>Listing title/description template</span></li>
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
         </ul>
-
-        <div class="cta-row">
-          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19.99</button>
-        </div>
+        <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
       </div>
     </div>
   </div>
@@ -431,7 +434,11 @@
   const finishPanel = document.getElementById("finishPanel");
   const editBackBtn = document.getElementById("editBackBtn");
   const resultBox = document.getElementById("estimateResult");
+  const pdfBar = document.getElementById("pdfBar");
+  const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+
   let currentStep = 0;
+  let pdfObjectUrl = null;
 
   function showStep(i){
     steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
@@ -514,29 +521,32 @@
   document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
   closeModalBtn.addEventListener('click', closeModal);
 
-  // ---- Checkout/estimate actions ----
-  const USE_CHECKOUT = false; // dev: bypass Stripe
+  // ---- Checkout/estimate actions (dev mode: no Stripe) ----
+  const USE_CHECKOUT = false;
 
-  chooseRevealBtn.addEventListener('click', () => {
+  chooseRevealBtn.addEventListener('click', async () => {
     if (USE_CHECKOUT){
       window.location = '/checkout?plan=reveal_199';
       return;
     }
     closeModal();
-    requestEstimate(); // proceed without checkout (dev)
+    pdfBar.classList.add("hidden");
+    await requestEstimate();
   });
 
   choosePdfBtn.addEventListener('click', async () => {
     if (USE_CHECKOUT){
-      window.location = '/checkout?plan=pdf_1999'; // example
+      window.location = '/checkout?plan=pdf_1900';
       return;
     }
     closeModal();
-    requestEstimate({ alsoMakePdf: true }); // dev: estimate + build PDF, then show download button
+    pdfBar.classList.add("hidden");
+    await requestEstimate();       // show on-page estimate
+    await generatePdf();           // then build PDF & show download button
   });
 
-  // ----- Results flow -----
-  async function requestEstimate(opts = {}){
+  // ----- Results request -----
+  async function requestEstimate(){
     // Hide finish screen, show results-only layout
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
@@ -567,17 +577,9 @@
           ${data.range ? `<p class="fine">Range: ${data.range.low || "$—"} – ${data.range.high || "$—"}</p>` : ""}
           ${data.confidence ? `<p class="fine">Confidence: ${data.confidence}</p>` : ""}
           ${data.rationale ? `<p class="fine">Why: ${data.rationale}</p>` : ""}
-          <div class="actions">
-            <a class="btn btn-primary" href="index.html#reviews">See reviews</a>
-            <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
-          </div>
         </div>
       `;
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
-
-      if (opts.alsoMakePdf){
-        makePdf(payload, data);
-      }
     } catch (err) {
       // On error, revert to finish screen
       document.body.classList.remove("results-only");
@@ -589,75 +591,60 @@
     }
   }
 
-  // Generate PDF and append a download button (dev mode)
-  async function makePdf(payload, estimateData){
-    const prepId = "pdfPrepMsg";
-    const prep = document.createElement('p');
-    prep.id = prepId;
-    prep.className = 'fine';
-    prep.style.marginTop = '8px';
-    prep.textContent = 'Preparing your Sell-Ready PDF…';
-    resultBox.appendChild(prep);
+  // ----- PDF generation (via Vercel API) -----
+  const PDF_ENDPOINT = "/api/pdf";
+
+  async function generatePdf(){
+    // clear any previous URL
+    if (pdfObjectUrl){
+      URL.revokeObjectURL(pdfObjectUrl);
+      pdfObjectUrl = null;
+    }
+
+    const payload = Object.fromEntries(new FormData(form).entries());
+    payload.includeTrend = true; // always include market trend in the Sell-Ready PDF
+
+    // Optional little spinner on the button area
+    pdfBar.classList.add("hidden");
 
     try {
-      const res = await fetch("/pdf", {
+      const resp = await fetch(PDF_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...payload,
-          estimate: estimateData,
-          includeChart: true // always include chart now
-        })
+        body: JSON.stringify(payload)
       });
 
-      let downloadUrl = null;
-
-      const ct = res.headers.get('content-type') || '';
-      if (ct.includes('application/pdf')) {
-        const blob = await res.blob();
-        downloadUrl = URL.createObjectURL(blob);
-      } else {
-        const json = await res.json().catch(()=>({}));
-        downloadUrl = json?.url || json?.pdfUrl || null;
+      const ct = (resp.headers.get("content-type") || "").toLowerCase();
+      if (!resp.ok || !ct.includes("application/pdf")) {
+        // try to parse to surface server error
+        let msg = "PDF generation failed.";
+        try { const j = await resp.json(); if (j?.error) msg = j.error; } catch {}
+        throw new Error(msg);
       }
 
-      document.getElementById(prepId)?.remove();
+      const blob = await resp.blob();
+      pdfObjectUrl = URL.createObjectURL(blob);
 
-      if (!downloadUrl) {
-        const errP = document.createElement('p');
-        errP.className = 'error';
-        errP.textContent = 'PDF was generated, but we could not find a download link.';
-        resultBox.appendChild(errP);
-        return;
-      }
+      // file name from header (fallback to default)
+      let fname = "Hullify-Sell-Ready-Valuation.pdf";
+      const cd = resp.headers.get("content-disposition") || "";
+      const m = cd.match(/filename="?([^"]+)"?/i);
+      if (m && m[1]) fname = m[1];
 
-      const actions = resultBox.querySelector('.actions');
-      const dl = document.createElement('a');
-      dl.className = 'btn btn-primary';
-      dl.href = downloadUrl;
-      dl.target = '_blank';
-      dl.rel = 'noopener';
-      dl.download = 'Hullify-Sell-Ready-Valuation.pdf';
-      dl.textContent = 'Download Sell-Ready PDF';
-      actions?.append(dl);
+      downloadPdfBtn.href = pdfObjectUrl;
+      downloadPdfBtn.setAttribute("download", fname);
+
+      pdfBar.classList.remove("hidden");
+      pdfBar.scrollIntoView({behavior:"smooth", block:"center"});
     } catch (e) {
-      document.getElementById(prepId)?.remove();
-      const errP = document.createElement('p');
-      errP.className = 'error';
-      errP.textContent = 'Could not generate the PDF. Please try again.';
-      resultBox.appendChild(errP);
+      resultBox.insertAdjacentHTML("beforeend",
+        `<p class="error" style="margin-top:8px">PDF error: ${e.message}</p>`);
     }
   }
 
-  // Edit details from results
-  document.addEventListener("click", (e) => {
-    const link = e.target.closest('a#editDetailsLink');
-    if (!link) return;
-    e.preventDefault();
-    document.body.classList.remove("results-only");
-    currentStep = steps.length - 1;
-    showStep(currentStep);
-    document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
+  // Clean up the blob URL if the user navigates away
+  window.addEventListener("beforeunload", () => {
+    if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
   });
 </script>
 </body>
