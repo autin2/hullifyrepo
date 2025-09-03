@@ -28,7 +28,7 @@
       border:1px solid var(--border);border-radius:16px;padding:28px;text-align:center;
       background:
         radial-gradient(800px 160px at 50% -40px, #cfe2ff 0%, transparent 60%),
-        linear-gradient(180deg,#fff 0%, #f7fbff 100%);
+        linear-gradient(180deg,#fff, #f7fbff);
       box-shadow:0 10px 30px rgba(0,0,0,.06);
     }
     .finish-panel h3{margin:0 0 6px;color:var(--primary);font-size:22px}
@@ -444,6 +444,7 @@
   const resultBox = document.getElementById("estimateResult");
   let currentStep = 0;
   let lastPayload = null;
+  let lastValuation = null;   // <--- store the exact valuation we show
   let allowDownloadPdf = false;
 
   function showStep(i){
@@ -567,6 +568,10 @@
       });
       const data = await res.json();
 
+      // save exact things we showed
+      lastPayload = payload;
+      lastValuation = data;
+
       // results UI
       const nameLine = `${(payload.make||"").trim()} ${(payload.model||"").trim()}`.trim();
       const metaLine = `${payload.year||"—"} • ${payload.length||"—"} ft`;
@@ -598,7 +603,12 @@
             const pdfRes = await fetch("/api/pdf", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ ...(lastPayload||payload||{}), includeTrend: true })
+              // KEY CHANGE: send both payload AND the valuation we just showed
+              body: JSON.stringify({
+                payload: (lastPayload || payload || {}),
+                valuation: lastValuation,
+                includeTrend: true
+              })
             });
             if (!pdfRes.ok) throw new Error("PDF failed");
             const blob = await pdfRes.blob();
