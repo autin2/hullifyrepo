@@ -21,6 +21,7 @@
     .right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
+
     /* Standalone finish panel */
     #finishPanel{display:none}
     .finish-only #finishPanel{display:block}
@@ -83,6 +84,19 @@
     .checkbox-field input[type="checkbox"]{
       width:18px; height:18px; accent-color:var(--primary);
       margin:0;
+    }
+
+    /* ---- Button loading state ---- */
+    .btn.is-loading{
+      opacity:.9;
+      pointer-events:none;
+      position:relative;
+    }
+    .btn.is-loading .spinner{
+      width:14px;
+      height:14px;
+      border-width:2px;
+      margin-right:8px;
     }
   </style>
 </head>
@@ -436,6 +450,7 @@
   const resultBox = document.getElementById("estimateResult");
   const pdfBar = document.getElementById("pdfBar");
   const downloadPdfBtn = document.getElementById("downloadPdfBtn");
+  const finishSubmitBtn = document.getElementById("finishSubmitBtn");
 
   let currentStep = 0;
   let pdfObjectUrl = null;
@@ -484,6 +499,21 @@
   editBackBtn.addEventListener("click", exitFinishOnly);
   showStep(currentStep);
 
+  // ----- Button loading helper -----
+  function setButtonLoading(btn, loading, label = "Loading…"){
+    if (!btn) return;
+    if (loading) {
+      if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
+      btn.classList.add("is-loading");
+      btn.innerHTML = `<span class="spinner"></span>${label}`;
+      btn.disabled = true;
+    } else {
+      btn.classList.remove("is-loading");
+      if (btn.dataset.origHtml) btn.innerHTML = btn.dataset.origHtml;
+      btn.disabled = false;
+    }
+  }
+
   // ----- Paywall modal -----
   const paywallModal = document.getElementById('paywallModal');
   const closeModalBtn = document.getElementById('closeModalBtn');
@@ -499,9 +529,12 @@
     document.body.style.overflow = '';
   }
 
-  // Intercept "Get estimate" -> show modal
-  document.getElementById("finishSubmitBtn").addEventListener("click", () => {
+  // Intercept "Get estimate" -> show modal (with quick loading feedback)
+  finishSubmitBtn.addEventListener("click", () => {
+    setButtonLoading(finishSubmitBtn, true, "Loading options…");
+
     if (!form.checkValidity()){
+      setButtonLoading(finishSubmitBtn, false);
       exitFinishOnly();
       const firstInvalid = form.querySelector(":invalid");
       if (firstInvalid){
@@ -515,6 +548,7 @@
       return;
     }
     openModal();
+    setButtonLoading(finishSubmitBtn, false);
   });
 
   // Close modal handlers
@@ -529,9 +563,14 @@
       window.location = '/checkout?plan=reveal_199';
       return;
     }
-    closeModal();
+    setButtonLoading(chooseRevealBtn, true, "Loading estimate…");
     pdfBar.classList.add("hidden");
-    await requestEstimate();
+    try {
+      await requestEstimate();
+      closeModal();
+    } finally {
+      setButtonLoading(chooseRevealBtn, false);
+    }
   });
 
   choosePdfBtn.addEventListener('click', async () => {
@@ -539,10 +578,15 @@
       window.location = '/checkout?plan=pdf_1900';
       return;
     }
-    closeModal();
+    setButtonLoading(choosePdfBtn, true, "Building PDF…");
     pdfBar.classList.add("hidden");
-    await requestEstimate();       // show on-page estimate
-    await generatePdf();           // then build PDF & show download button
+    try {
+      await requestEstimate();   // show on-page estimate
+      await generatePdf();       // create PDF & reveal download button
+      closeModal();
+    } finally {
+      setButtonLoading(choosePdfBtn, false);
+    }
   });
 
   // ----- Results request -----
@@ -604,7 +648,7 @@
     const payload = Object.fromEntries(new FormData(form).entries());
     payload.includeTrend = true; // always include market trend in the Sell-Ready PDF
 
-    // Optional little spinner on the button area
+    // Optional: hide bar during generation
     pdfBar.classList.add("hidden");
 
     try {
@@ -616,7 +660,6 @@
 
       const ct = (resp.headers.get("content-type") || "").toLowerCase();
       if (!resp.ok || !ct.includes("application/pdf")) {
-        // try to parse to surface server error
         let msg = "PDF generation failed.";
         try { const j = await resp.json(); if (j?.error) msg = j.error; } catch {}
         throw new Error(msg);
