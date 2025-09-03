@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Hullify — Detailed Estimate</title>
   <link rel="stylesheet" href="style.css"/>
 
-  <!-- Page-local helpers for the wizard + finish/results views + modal -->
+  <!-- Page-local helpers for the wizard + finish/results views -->
   <style>
     .form-section{padding-top:12px;margin-top:14px;border-top:1px solid var(--border)}
     .form-section:first-of-type{border-top:0;margin-top:0;padding-top:0}
@@ -21,8 +21,6 @@
     .right-actions{display:flex;gap:10px;flex-wrap:wrap}
     .hidden{display:none!important}
     .step-indicator{color:var(--muted);font-weight:700;margin:6px 0 0}
-
-    /* Standalone finish panel */
     #finishPanel{display:none}
     .finish-only #finishPanel{display:block}
     .finish-panel{
@@ -37,58 +35,30 @@
     .finish-panel .muted{margin:0 0 16px}
     .finish-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
     .pill{display:inline-block;padding:8px 12px;border-radius:999px;border:1px solid var(--border);background:#fff;color:var(--muted);font-weight:700}
-    /* Finish-only hides wizard+progress for a clean screen */
     .finish-only .card.big, .finish-only .progress-wrap{display:none}
 
-    /* ---------- Paywall modal ---------- */
-    .modal{position:fixed;inset:0;display:none;z-index:1000}
+    /* Paywall modal (from earlier steps) */
+    .modal{position:fixed;inset:0;display:none}
     .modal.open{display:block}
-    .modal-backdrop{position:absolute;inset:0;background:#0006;backdrop-filter:blur(2px)}
+    .modal-backdrop{position:absolute;inset:0;background:rgba(6,22,41,.55)}
     .modal-box{
-      position:relative;z-index:1;max-width:960px;margin:6vh auto;background:#fff;border-radius:16px;
-      border:1px solid var(--border);box-shadow:0 20px 60px rgba(0,0,0,.2);padding:20px;
+      position:relative;z-index:2;max-width:900px;margin:60px auto;background:#fff;border-radius:16px;
+      border:1px solid var(--border);padding:18px 18px 22px;box-shadow:0 20px 60px rgba(0,0,0,.25)
     }
     .modal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
     .modal-title{margin:0;color:var(--primary)}
-    .modal-close{border:0;background:transparent;font-size:22px;line-height:1;cursor:pointer;color:var(--muted)}
-    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-    @media (max-width:900px){.option-grid{grid-template-columns:1fr}}
-    .option-card{
-      position:relative;display:flex;flex-direction:column;gap:10px;
-      border:1px solid var(--border);border-radius:14px;padding:16px;background:#fff;
-    }
-    .option-card .badge{
-      position:absolute;top:10px;left:10px;
-      background:#e9f2ff;border:1px solid #cfe2ff;border-radius:999px;padding:4px 8px;font-size:12px;font-weight:700;color:var(--primary)
-    }
-    .option-card h4{margin:18px 0 4px}
-    .option-card .sub{margin:0;color:var(--muted)}
-    .option-card .price{font-size:26px;font-weight:800;color:var(--primary);margin-top:2px}
-    .feature-list{list-style:none;padding:0;margin:6px 0 0}
-    .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--ink)}
-    .icon-pos{color:#1a7f37;font-weight:800}
-    .icon-neg{color:#9c2b2e;font-weight:800}
-    .option-card .btn{margin-top:auto} /* align CTAs */
-
-    /* download bar beneath results */
-    #pdfBar{margin-top:12px;display:flex;gap:10px;flex-wrap:wrap}
-
-    /* Input-like checkbox so it aligns with other fields */
-    .checkbox-field{
-      display:flex; align-items:center; gap:10px;
-      height:44px; padding:0 12px;
-      border:1px solid var(--border); border-radius:10px; background:#fff;
-      font-weight:600; color:var(--ink);
-    }
-    .checkbox-field:hover{border-color:#bcd3ef; box-shadow:0 0 0 3px #e7f1ff}
-    .checkbox-field input[type="checkbox"]{
-      width:18px; height:18px; accent-color:var(--primary);
-      margin:0;
-    }
-
-    /* ---- Button loading state ---- */
-    .btn.is-loading{opacity:.9;pointer-events:none;position:relative}
-    .btn.is-loading .spinner{width:14px;height:14px;border-width:2px;margin-right:8px}
+    .modal-close{border:0;background:transparent;font-size:26px;line-height:1;cursor:pointer}
+    .option-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .option-card{border:1px solid var(--border);border-radius:14px;padding:14px;background:#fff;position:relative}
+    .option-card h4{margin:0 0 4px;color:var(--ink)}
+    .option-card .sub{color:var(--muted);margin:0 0 8px}
+    .option-card .badge{position:absolute;top:10px;left:10px;background:#e8f3ff;border:1px solid #cfe2ff;border-radius:999px;padding:4px 8px;color:#014a8c;font-size:12px;font-weight:800}
+    .option-card .price{font-weight:800;color:var(--primary);font-size:22px;margin:6px 0 10px}
+    .feature-list{list-style:none;padding:0;margin:0 0 12px}
+    .feature-list li{display:flex;gap:8px;align-items:flex-start;margin:6px 0;color:var(--muted)}
+    .icon-pos{color:#067642;font-weight:900}
+    .icon-neg{color:#9a2936;font-weight:900}
+    .get-btn-wrap{display:flex;align-items:flex-end;justify-content:center;margin-top:14px}
   </style>
 </head>
 <body>
@@ -337,14 +307,6 @@
 
     <!-- RESULT -->
     <div id="estimateResult" class="result hidden" style="margin-top:18px;"></div>
-
-    <!-- Download bar (shown after PDF is ready) -->
-    <div id="pdfBar" class="actions hidden">
-      <a id="downloadPdfBtn" class="btn btn-primary" href="#" download="Hullify-Sell-Ready-Valuation.pdf">
-        Download PDF
-      </a>
-      <a class="btn btn-ghost" href="#estimate-form">Edit details</a>
-    </div>
   </section>
 </main>
 
@@ -358,7 +320,6 @@
     </div>
 
     <div class="option-grid">
-      <!-- Reveal Estimate -->
       <div class="option-card">
         <div class="badge">Most affordable</div>
         <h4>Reveal Estimate</h4>
@@ -368,25 +329,28 @@
           <li><span class="icon-pos">✓</span><span>Instant reveal on this page</span></li>
           <li><span class="icon-pos">✓</span><span>Value, range &amp; confidence score</span></li>
           <li><span class="icon-neg">–</span><span>No downloadable PDF</span></li>
-          <li><span class="icon-neg">–</span><span>No market trend chart</span></li>
+          <li><span class="icon-neg">–</span><span>Market trend chart not included</span></li>
         </ul>
-        <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+        <div class="get-btn-wrap">
+          <button id="chooseRevealBtn" class="btn btn-primary full">Reveal for $1.99</button>
+        </div>
       </div>
 
-      <!-- Sell-Ready PDF (includes market trend by default) -->
       <div class="option-card">
         <div class="badge">Best for selling</div>
         <h4>Sell-Ready PDF</h4>
-        <p class="sub">Branded report + market trend chart. <strong>Boosts buyer interest ~50%</strong>.</p>
+        <p class="sub">Branded report (includes trend chart) to attach to your listing.</p>
         <div class="price">$19</div>
         <ul class="feature-list">
           <li><span class="icon-pos">✓</span><span>Branded PDF with value, range &amp; confidence</span></li>
-          <li><span class="icon-pos">✓</span><span>Market Trend Chart included</span></li>
           <li><span class="icon-pos">✓</span><span>Local comps &amp; pricing bullets</span></li>
           <li><span class="icon-pos">✓</span><span>Listing title/description template</span></li>
           <li><span class="icon-pos">✓</span><span>Prep checklist &amp; photo shot-list</span></li>
+          <li><span class="icon-pos">✓</span><span><strong>Market Trend Chart included</strong></span></li>
         </ul>
-        <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+        <div class="get-btn-wrap">
+          <button id="choosePdfBtn" class="btn btn-primary full">Get PDF for $19</button>
+        </div>
       </div>
     </div>
   </div>
@@ -405,12 +369,51 @@
 <script>
   document.getElementById("year").textContent = new Date().getFullYear();
 
-  // ----- Progress bar (ignore data-optional="true") -----
+  /* -------------------------- constants & storage -------------------------- */
+  const STORAGE_KEY = "hullify:payload:v1";
+  const PLAN_REVEAL = "reveal_199";
+  const PLAN_PDF = "pdf_1900";
+
+  function savePayload() {
+    const data = Object.fromEntries(new FormData(form).entries());
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ t: Date.now(), data }));
+  }
+  function loadSaved() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      const obj = JSON.parse(raw);
+      if (!obj || !obj.data) return null;
+      // 24h TTL
+      if (Date.now() - (obj.t || 0) > 24 * 3600 * 1000) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return obj.data;
+    } catch {
+      return null;
+    }
+  }
+  function restoreForm(payload) {
+    if (!payload) return;
+    [...form.elements].forEach(el => {
+      if (!el.name) return;
+      if (payload[el.name] === undefined) return;
+      if (el.type === "checkbox") {
+        const v = payload[el.name];
+        el.checked = v === "yes" || v === "on" || v === true || v === "true";
+      } else {
+        el.value = payload[el.name];
+      }
+    });
+    updateProgress();
+  }
+
+  /* ------------------------------- progress ------------------------------- */
   const form = document.getElementById("fullEstimateForm");
   const progressFill = document.getElementById("progressFill");
   const progressPct = document.getElementById("progressPct");
   const completedPill = document.getElementById("completedPill");
-
   const trackable = Array.from(form.querySelectorAll("input, select, textarea"))
     .filter(el => el.name && el.type !== "hidden" && el.dataset.optional !== "true");
 
@@ -431,7 +434,7 @@
   trackable.forEach(el => ["input","change","blur"].forEach(evt => el.addEventListener(evt, updateProgress)));
   updateProgress();
 
-  // ----- Wizard behavior (5 steps) -----
+  /* -------------------------------- wizard -------------------------------- */
   const steps = Array.from(document.querySelectorAll(".wizard-step"));
   const prevBtn = document.getElementById("prevBtn");
   const nextBtn = document.getElementById("nextBtn");
@@ -439,16 +442,9 @@
   const finishPanel = document.getElementById("finishPanel");
   const editBackBtn = document.getElementById("editBackBtn");
   const resultBox = document.getElementById("estimateResult");
-  const pdfBar = document.getElementById("pdfBar");
-  const downloadPdfBtn = document.getElementById("downloadPdfBtn");
-  const finishSubmitBtn = document.getElementById("finishSubmitBtn");
-  const paywallModal = document.getElementById('paywallModal');
-  const closeModalBtn = document.getElementById('closeModalBtn');
-  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
-  const choosePdfBtn = document.getElementById('choosePdfBtn');
-
   let currentStep = 0;
-  let pdfObjectUrl = null;
+  let lastPayload = null;
+  let allowDownloadPdf = false;
 
   function showStep(i){
     steps.forEach((s,idx)=>s.classList.toggle("active", idx===i));
@@ -456,7 +452,6 @@
     stepIndicator.textContent = `Step ${i+1} of ${steps.length} • ${steps[i].querySelector(".section-title").textContent}`;
     steps[i].scrollIntoView({behavior:"smooth", block:"start"});
   }
-
   function stepIsValid(i){
     const requiredFields = Array.from(steps[i].querySelectorAll("[required]"));
     for (const el of requiredFields){
@@ -467,11 +462,9 @@
     }
     return true;
   }
-
   prevBtn.addEventListener("click", () => {
     if (currentStep > 0){ currentStep--; showStep(currentStep); }
   });
-
   nextBtn.addEventListener("click", () => {
     if (!stepIsValid(currentStep)) return;
     if (currentStep < steps.length - 1){
@@ -480,7 +473,6 @@
       enterFinishOnly();
     }
   });
-
   function enterFinishOnly(){
     document.body.classList.add("finish-only");
     finishPanel.classList.remove("hidden");
@@ -494,37 +486,18 @@
   editBackBtn.addEventListener("click", exitFinishOnly);
   showStep(currentStep);
 
-  // ----- Button loading helper -----
-  function setButtonLoading(btn, loading, label = "Loading…"){
-    if (!btn) return;
-    if (loading) {
-      if (!btn.dataset.origHtml) btn.dataset.origHtml = btn.innerHTML;
-      btn.classList.add("is-loading");
-      btn.innerHTML = `<span class="spinner"></span>${label}`;
-      btn.disabled = true;
-    } else {
-      btn.classList.remove("is-loading");
-      if (btn.dataset.origHtml) btn.innerHTML = btn.dataset.origHtml;
-      btn.disabled = false;
-    }
-  }
+  /* ----------------------------- paywall modal ---------------------------- */
+  const paywallModal = document.getElementById('paywallModal');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+  const chooseRevealBtn = document.getElementById('chooseRevealBtn');
+  const choosePdfBtn = document.getElementById('choosePdfBtn');
 
-  // ----- Paywall modal -----
-  function openModal(){
-    paywallModal.classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal(){
-    paywallModal.classList.remove('open');
-    document.body.style.overflow = '';
-  }
+  function openModal(){ paywallModal.classList.add('open'); document.body.style.overflow = 'hidden'; }
+  function closeModal(){ paywallModal.classList.remove('open'); document.body.style.overflow = ''; }
 
-  // Intercept "Get estimate" -> show modal (with quick loading feedback)
-  finishSubmitBtn.addEventListener("click", () => {
-    setButtonLoading(finishSubmitBtn, true, "Loading options…");
-
+  // Intercept "Get estimate" -> show modal
+  document.getElementById("finishSubmitBtn").addEventListener("click", () => {
     if (!form.checkValidity()){
-      setButtonLoading(finishSubmitBtn, false);
       exitFinishOnly();
       const firstInvalid = form.querySelector(":invalid");
       if (firstInvalid){
@@ -538,48 +511,46 @@
       return;
     }
     openModal();
-    setButtonLoading(finishSubmitBtn, false);
   });
 
   document.querySelector('#paywallModal .modal-backdrop').addEventListener('click', closeModal);
   closeModalBtn.addEventListener('click', closeModal);
 
-  // ---- Stripe Checkout on (set true for live/test payments) ----
+  // ----------- Toggle this when you want Stripe enabled in prod -----------
   const USE_CHECKOUT = true;
 
-  chooseRevealBtn.addEventListener('click', async () => {
+  chooseRevealBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
-      window.location = '/api/checkout?plan=reveal_199';
+      savePayload(); // persist before redirect
+      window.location = '/api/checkout?plan=' + PLAN_REVEAL;
       return;
     }
-    setButtonLoading(chooseRevealBtn, true, "Loading estimate…");
-    pdfBar.classList.add("hidden");
-    try {
-      await requestEstimate();
-      closeModal();
-    } finally {
-      setButtonLoading(chooseRevealBtn, false);
-    }
+    closeModal();
+    lastPayload = Object.fromEntries(new FormData(form).entries());
+    requestEstimate(lastPayload);
   });
 
-  choosePdfBtn.addEventListener('click', async () => {
+  choosePdfBtn.addEventListener('click', () => {
     if (USE_CHECKOUT){
-      window.location = '/api/checkout?plan=pdf_1900';
+      savePayload();
+      window.location = '/api/checkout?plan=' + PLAN_PDF;
       return;
     }
-    setButtonLoading(choosePdfBtn, true, "Building PDF…");
-    pdfBar.classList.add("hidden");
-    try {
-      await requestEstimate();   // show on-page estimate
-      await generatePdf();       // create PDF & reveal download button
-      closeModal();
-    } finally {
-      setButtonLoading(choosePdfBtn, false);
-    }
+    closeModal();
+    lastPayload = Object.fromEntries(new FormData(form).entries());
+    allowDownloadPdf = true;
+    requestEstimate(lastPayload);
   });
 
-  // ----- Results request -----
-  async function requestEstimate(){
+  /* ------------------------------ result flow ----------------------------- */
+  function showDownloadBtn(show){
+    const btn = document.getElementById("downloadPdfBtn");
+    if (!btn) return;
+    btn.classList.toggle("hidden", !show);
+  }
+
+  async function requestEstimate(payload){
+    // Reveal results layout
     finishPanel.classList.add("hidden");
     document.body.classList.remove("finish-only");
     document.body.classList.add("results-only");
@@ -588,108 +559,106 @@
     resultBox.classList.add("loading");
     resultBox.innerHTML = "<div class='spinner'></div><p class='muted'>Calculating estimate…</p>";
 
-    const payload = Object.fromEntries(new FormData(form).entries());
-
     try {
       const res = await fetch("/estimate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(payload || {})
       });
       const data = await res.json();
+
+      // results UI
+      const nameLine = `${(payload.make||"").trim()} ${(payload.model||"").trim()}`.trim();
+      const metaLine = `${payload.year||"—"} • ${payload.length||"—"} ft`;
 
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `
         <div class="estimate-result">
           <h3>Your Estimated Value</h3>
-          <p class="muted">
-            ${(payload.make||"").trim()} ${(payload.model||"").trim()} • ${payload.year||"—"} • ${payload.length||"—"} ft
-          </p>
+          <p class="muted"> ${nameLine || "• —"} • ${metaLine} </p>
           <div class="estimate-pill">${data.estimate || "$—"}</div>
           ${data.range ? `<p class="fine">Range: ${data.range.low || "$—"} – ${data.range.high || "$—"}</p>` : ""}
           ${data.confidence ? `<p class="fine">Confidence: ${data.confidence}</p>` : ""}
           ${data.rationale ? `<p class="fine">Why: ${data.rationale}</p>` : ""}
+          <div class="actions">
+            <button id="downloadPdfBtn" class="btn btn-primary ${allowDownloadPdf ? "" : "hidden"}">Download PDF</button>
+            <a id="editDetailsLink" class="btn btn-ghost" href="#estimate-form">Edit details</a>
+          </div>
         </div>
       `;
+
+      // wire download button
+      const dl = document.getElementById("downloadPdfBtn");
+      if (dl){
+        dl.onclick = async () => {
+          dl.disabled = true;
+          const prev = dl.textContent;
+          dl.textContent = "Preparing PDF…";
+          try {
+            const pdfRes = await fetch("/api/pdf", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ ...(lastPayload||payload||{}), includeTrend: true })
+            });
+            if (!pdfRes.ok) throw new Error("PDF failed");
+            const blob = await pdfRes.blob();
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            const fname = `Hullify_Valuation_${(payload.make||"Boat").replace(/\s+/g,"_").slice(0,32)}_${payload.year||""}.pdf`;
+            a.download = fname;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            URL.revokeObjectURL(url);
+          } catch (e) {
+            alert("Could not download PDF. Please try again.");
+          } finally {
+            dl.disabled = false;
+            dl.textContent = prev;
+          }
+        };
+      }
+
       resultBox.scrollIntoView({ behavior: "smooth", block: "center" });
     } catch (err) {
       document.body.classList.remove("results-only");
       document.body.classList.add("finish-only");
       finishPanel.classList.remove("hidden");
+
       resultBox.classList.remove("loading");
       resultBox.innerHTML = `<p class="error">Something went wrong. Please try again.</p>`;
     }
   }
 
-  // ----- PDF generation -----
-  const PDF_ENDPOINT = "/api/pdf";
-  async function generatePdf(){
-    if (pdfObjectUrl){ URL.revokeObjectURL(pdfObjectUrl); pdfObjectUrl = null; }
-
-    const payload = Object.fromEntries(new FormData(form).entries());
-    payload.includeTrend = true; // always include trend in Sell-Ready PDF
-
-    pdfBar.classList.add("hidden");
-
-    try {
-      const resp = await fetch(PDF_ENDPOINT, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      });
-
-      const ct = (resp.headers.get("content-type") || "").toLowerCase();
-      if (!resp.ok || !ct.includes("application/pdf")) {
-        let msg = "PDF generation failed.";
-        try { const j = await resp.json(); if (j?.error) msg = j.error; } catch {}
-        throw new Error(msg);
-      }
-
-      const blob = await resp.blob();
-      pdfObjectUrl = URL.createObjectURL(blob);
-
-      let fname = "Hullify-Sell-Ready-Valuation.pdf";
-      const cd = resp.headers.get("content-disposition") || "";
-      const m = cd.match(/filename="?([^"]+)"?/i);
-      if (m && m[1]) fname = m[1];
-
-      downloadPdfBtn.href = pdfObjectUrl;
-      downloadPdfBtn.setAttribute("download", fname);
-
-      pdfBar.classList.remove("hidden");
-      pdfBar.scrollIntoView({behavior:"smooth", block:"center"});
-    } catch (e) {
-      resultBox.insertAdjacentHTML("beforeend",
-        `<p class="error" style="margin-top:8px">PDF error: ${e.message}</p>`);
-    }
-  }
-
-  // Clean up blob URL
-  window.addEventListener("beforeunload", () => {
-    if (pdfObjectUrl) URL.revokeObjectURL(pdfObjectUrl);
+  // Edit details from results
+  document.addEventListener("click", (e) => {
+    const link = e.target.closest('a#editDetailsLink');
+    if (!link) return;
+    e.preventDefault();
+    document.body.classList.remove("results-only");
+    currentStep = steps.length - 1;
+    showStep(currentStep);
+    document.getElementById("estimate-form").scrollIntoView({behavior:"smooth"});
   });
 
-  // ----- Post-Checkout success flow -----
-  (async () => {
+  /* --------------------- restore after Stripe redirect --------------------- */
+  (function bootstrapFromQuery(){
     const params = new URLSearchParams(location.search);
-    if (params.get("success") === "1") {
-      const plan = params.get("plan") || "";
-      try {
-        // show estimate for both plans
-        await requestEstimate();
-        // build PDF only for the $19 plan
-        if (plan.startsWith("pdf")) {
-          await generatePdf();
-        }
-      } finally {
-        // clean the URL (keep hash if any)
-        const hash = location.hash || "";
-        history.replaceState({}, "", "estimate.html" + hash);
-      }
-    } else if (params.get("canceled") === "1") {
-      // clean URL and optionally re-open modal
-      history.replaceState({}, "", "estimate.html");
-      // openModal(); // uncomment if you want to reopen the modal automatically
+    const success = params.get("success") === "1";
+    const plan = params.get("plan");
+
+    // Always try to restore fields, so users see their data if they come back.
+    const saved = loadSaved();
+    if (saved) { restoreForm(saved); }
+
+    // If we just returned from checkout and we have saved payload, reveal estimate.
+    if (success && saved) {
+      lastPayload = saved;
+      allowDownloadPdf = (plan === PLAN_PDF);
+      requestEstimate(saved);
+      // Clean URL
+      history.replaceState(null, "", location.pathname);
     }
   })();
 </script>
