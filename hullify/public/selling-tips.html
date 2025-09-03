@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="style.css"/>
   <meta name="description" content="A practical 7-step guide to selling your boat in 2025: pricing bands, timing, prep, photos, short videos, listing formula, and safe messaging to close the deal.">
 
-  <!-- Local styles just for this page (keeps your main CSS untouched) -->
+  <!-- Local styles just for this page -->
   <style>
     /* “On this page” card */
     .toc-card { padding: 14px 16px; border:1px solid var(--border); border-radius:12px; background: var(--surface, #fff); }
@@ -18,12 +18,16 @@
     .steps li:first-child { border-top:0; }
     .steps a { display:flex; align-items:center; gap:12px; padding:10px 2px; text-decoration:none; color:inherit; }
     .steps a:hover { background: rgba(0,0,0,.04); border-radius:8px; }
-    .step-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; 
+    .step-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;
       background: rgba(0, 92, 255, .10); color: var(--primary,#0b5cff); border:1px solid rgba(0,0,0,.06); flex:0 0 28px; }
     .step-title { font-weight:600; }
     .step-arrow { margin-left:auto; opacity:.45; }
     /* Smooth anchor landing spacing under sticky header */
     .card.big, .page-header { scroll-margin-top: 80px; }
+
+    /* NEW: add a little space between each step box only on this page */
+    .steps-section > .card.big { margin-top: 16px; }
+    .steps-section > .card.big:first-child { margin-top: 0; }
   </style>
 </head>
 <body>
@@ -107,7 +111,8 @@
       </div>
     </section>
 
-    <section class="container">
+    <!-- Steps -->
+    <section class="container steps-section">
       <!-- 1 -->
       <div id="pricing" class="card big">
         <h2 style="margin-top:0;">1) Price With a Band, Not a Guess</h2>
@@ -203,12 +208,12 @@ Priced in the current market band. Ready for showings this week. Title in hand.
       </div>
     </section>
 
-    <!-- Bottom-only CTA (kept subtle and last) -->
+    <!-- Bottom-only CTA -->
     <section class="estimate-section" style="margin-top:18px;">
       <div class="container cta-strip">
         <div>
           <h2 style="margin:0;">Want a quick starting range?</h2>
-          <p class="muted" style="margin:4px 0 0;">Get a fast, market-aware estimate to anchor your pricing band — then use the steps above to sell with confidence.</p>
+        <p class="muted" style="margin:4px 0 0;">Get a fast, market-aware estimate to anchor your pricing band — then use the steps above to sell with confidence.</p>
         </div>
         <a class="btn btn-primary" href="estimate.html">Get My Instant Estimate</a>
       </div>
@@ -228,8 +233,7 @@ Priced in the current market band. Ready for showings this week. Title in hand.
 
   <script>
     document.getElementById("year").textContent = new Date().getFullYear();
-
-    // Smooth in-page scrolling for the steps list
+    // Smooth in-page scrolling
     document.querySelectorAll('a[data-scroll]').forEach(a => {
       a.addEventListener('click', (e) => {
         const id = a.getAttribute('href');
