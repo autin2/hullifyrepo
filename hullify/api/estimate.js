@@ -5,7 +5,6 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Use POST" });
   }
 
-  // --- parse JSON body (Vercel raw functions don't parse it) ---
   const payload = await readJsonBody(req);
 
   try {
