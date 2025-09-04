@@ -38,13 +38,20 @@
   <style>
     .hub-intro { margin-top: 6px; }
     .guides-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-    /* Exactly 3 per row on wider screens so the 4th wraps to a new line */
+    /* Keep exactly 3 per row on wide screens so the 4th wraps to a new line */
     @media (min-width: 900px){ .guides-grid{ grid-template-columns: repeat(3, 1fr); } }
-    .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); }
+    .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); transition:background .15s ease; }
     .guide-card:hover { background: rgba(0,0,0,.03); }
     .guide-meta { font-size:12px; color:var(--muted,#6b7280); margin:6px 0 0; }
-    .search { margin: 12px 0 2px; }
-    .search input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+
+    /* Search UI */
+    .search { margin: 12px 0 2px; display:flex; gap:8px; }
+    .search input[type="search"] { flex:1; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
+    .search button { padding:10px 12px; border:1px solid var(--border); background:#fff; border-radius:10px; cursor:pointer; }
+    .search button:hover { background: rgba(0,0,0,.03); }
+    .search-note { margin:6px 0 0; font-size:12px; color:var(--muted,#6b7280); }
+    .hidden { display:none !important; }
+    .no-results { padding:16px; border:1px dashed var(--border); border-radius:12px; background:var(--surface,#fff); }
   </style>
 </head>
 <body>
@@ -68,37 +75,46 @@
     <section class="container page-header">
       <h1>Boating Hacks — Tips & Guides</h1>
       <p class="muted hub-intro">Practical, no-drama guides to enjoy the water and make smarter decisions. Pick a topic below.</p>
-      <div class="search" role="search">
-        <input type="search" name="q" placeholder="Search boating tips..." aria-label="Search boating tips">
-      </div>
+
+      <!-- Search -->
+      <form id="searchForm" class="search" role="search" aria-label="Filter guides">
+        <input id="hacksSearch" type="search" name="q" placeholder="Search boating tips (e.g., docking, safety, food, selling)…" autocomplete="off" />
+        <button type="button" id="clearSearch" aria-label="Clear search">Clear</button>
+      </form>
+      <p class="search-note" aria-live="polite">
+        <span id="resultCount">Showing 4 guides</span>
+      </p>
     </section>
 
     <section class="container">
-      <div class="guides-grid" role="list">
-        <a class="guide-card card" role="listitem" href="selling-tips.html">
+      <div id="guidesGrid" class="guides-grid" role="list">
+        <a class="guide-card card" role="listitem" href="selling-tips.html" data-keywords="price pricing sell listing photos video messages safety">
           <h3>Boat Selling Tips (2025): Price Right, Sell Faster</h3>
           <p>A 7-step checklist for pricing bands, timing, prep, standout photos, concise listings, and safe messaging—plus a nudge to grab a quick value estimate first.</p>
           <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
         </a>
 
-        <a class="guide-card card" role="listitem" href="DockingGuide.html">
+        <a class="guide-card card" role="listitem" href="DockingGuide.html" data-keywords="dock docking approach spring line wind current crew">
           <h3>Beginner’s Guide to Docking a Boat</h3>
           <p>Calm, step-by-step docking: set fenders/lines, read wind & current, approach at 30–45°, short gear bursts, spring line first, and clean departures.</p>
           <p class="guide-meta">Read time: 5–7 min · Updated 2025</p>
         </a>
 
-        <a class="guide-card card" role="listitem" href="Safety-Tips.html">
+        <a class="guide-card card" role="listitem" href="Safety-Tips.html" data-keywords="safety pfd vhf float plan night rules first aid">
           <h3>Essential Boating Safety Tips</h3>
           <p>Pre-departure checklist, PFDs & kill switch, weather go/no-go, VHF & float plan, nav rules, night boating, and emergency basics—clear and printable.</p>
           <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
         </a>
 
-        <!-- NEW: Food ideas guide (wraps to the next line because grid stays at 3 columns) -->
-        <a class="guide-card card" role="listitem" href="Best-Food-For-Boating.html">
+        <a class="guide-card card" role="listitem" href="Best-Food-For-Boating.html" data-keywords="food cooler snacks lunch drinks fruit wraps sliders">
           <h3>Best Food For Boating — Easy, No-Mess Ideas</h3>
           <p>Cooler plan + make-ahead mains, grab-and-go snacks, kid-friendly options, hydrating fruit, and safe-temp tips—zero crumbs, zero chaos.</p>
           <p class="guide-meta">Read time: 5–7 min · Updated 2025</p>
         </a>
+      </div>
+
+      <div id="noResults" class="no-results hidden" role="status" aria-live="polite">
+        No guides match your search. Try “dock,” “safety,” “sell,” or “food,” or <a href="boating-hacks.html">show all</a>.
       </div>
     </section>
 
@@ -106,7 +122,7 @@
       <div class="container cta-strip">
         <div>
           <h2 style="margin:0;">Curious what your boat’s worth today?</h2>
-          <p class="muted" style="margin:4px 0 0;">Get a fast, market-aware estimate—great for planning upgrades or listing confidently.</p>
+        <p class="muted" style="margin:4px 0 0;">Get a fast, market-aware estimate—great for planning upgrades or listing confidently.</p>
         </div>
         <a class="btn btn-primary" href="estimate.html">Get My Instant Estimate</a>
       </div>
@@ -125,6 +141,85 @@
   </footer>
 
   <script>
+    // Utilities
+    const norm = s => (s || "").toLowerCase().normalize("NFKD").replace(/\s+/g, " ").trim();
+    const tokenize = q => norm(q).split(" ").filter(Boolean);
+
+    const $ = sel => document.querySelector(sel);
+    const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+    // Elements
+    const input = $('#hacksSearch');
+    const clearBtn = $('#clearSearch');
+    const grid = $('#guidesGrid');
+    const cards = $$('.guide-card');
+    const resultCount = $('#resultCount');
+    const noResults = $('#noResults');
+
+    // Cache searchable text per card
+    const cardIndex = new Map();
+    cards.forEach(card => {
+      const text = [
+        card.querySelector('h3')?.textContent || '',
+        card.querySelector('p')?.textContent || '',
+        card.getAttribute('data-keywords') || ''
+      ].join(' ');
+      cardIndex.set(card, norm(text));
+    });
+
+    // Filter logic (AND across tokens)
+    function applyFilter(q, {updateUrl = true} = {}) {
+      const tokens = tokenize(q);
+      let visible = 0;
+
+      cards.forEach(card => {
+        const hay = cardIndex.get(card);
+        const match = tokens.every(t => hay.includes(t));
+        card.classList.toggle('hidden', tokens.length && !match);
+        if (!tokens.length || match) visible++;
+      });
+
+      // UI updates
+      resultCount.textContent = `Showing ${visible} guide${visible === 1 ? '' : 's'}`;
+      noResults.classList.toggle('hidden', visible !== 0);
+
+      // URL ?q= sync (shareable state)
+      if (updateUrl) {
+        const url = new URL(window.location);
+        if (norm(q)) { url.searchParams.set('q', q); }
+        else { url.searchParams.delete('q'); }
+        history.replaceState(null, '', url);
+      }
+    }
+
+    // Debounce for nicer typing
+    let t;
+    input.addEventListener('input', () => {
+      clearTimeout(t);
+      t = setTimeout(() => applyFilter(input.value), 120);
+    });
+
+    // Prevent form submit page reload; pressing Enter just keeps focus
+    $('#searchForm').addEventListener('submit', (e) => e.preventDefault());
+
+    // Clear button
+    clearBtn.addEventListener('click', () => {
+      input.value = '';
+      input.focus();
+      applyFilter('', {updateUrl: true});
+    });
+
+    // Load state from ?q=
+    const params = new URLSearchParams(location.search);
+    const startQ = params.get('q') || '';
+    if (startQ) {
+      input.value = startQ;
+      applyFilter(startQ, {updateUrl: false});
+    } else {
+      applyFilter('', {updateUrl: false});
+    }
+
+    // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
   </script>
 </body>
