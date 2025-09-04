@@ -3,18 +3,69 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Hullify — Instant Boat Value Estimate</title>
 
-  <!-- Pinterest site verification -->
+  <title>Hullify — Instant Boat Value Estimate, Guides & Boating Hacks (2025)</title>
+  <meta name="description" content="Know your boat’s worth in minutes with a fast, AI-assisted estimate. Read practical boating guides like Selling Tips and a calm, step-by-step Docking Guide.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://hullify.com/"/>
+
+  <!-- Pinterest site verification (kept from your file) -->
   <meta name="p:domain_verify" content="714cdb73cf01cb4b240784064a436dbf"/>
 
+  <!-- Icons / CSS -->
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css"/>
 
-  <script>
-    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Hullify — Instant Boat Value Estimate, Guides & Boating Hacks (2025)">
+  <meta property="og:description" content="Fast boat estimates + practical guides. Price smarter. Dock calmer.">
+  <meta property="og:url" content="https://hullify.com/">
+  <meta property="og:image" content="https://hullify.com/images/og-home.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Hullify — Instant Boat Value Estimate, Guides & Boating Hacks (2025)">
+  <meta name="twitter:description" content="Get your boat’s value in minutes and read no-drama guides.">
+  <meta name="twitter:image" content="https://hullify.com/images/og-home.jpg">
+
+  <!-- JSON-LD: WebSite + Organization -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"WebSite",
+    "name":"Hullify",
+    "url":"https://hullify.com/",
+    "potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://hullify.com/boating-hacks.html?q={search_term_string}",
+      "query-input":"required name=search_term_string"
+    }
+  }
   </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Organization",
+    "name":"Hullify",
+    "url":"https://hullify.com/",
+    "logo":"https://hullify.com/favicon.ico",
+    "sameAs":[]
+  }
+  </script>
+
+  <!-- Vercel insights (kept from your file) -->
+  <script>window.va = window.va || function(){(window.vaq = window.vaq || []).push(arguments);};</script>
   <script defer src="/_vercel/insights/script.js"></script>
+
+  <style>
+    /* Small home-only enhancements */
+    .guides { margin-top: 18px }
+    .guides-grid { display:grid; gap:14px; grid-template-columns:1fr; }
+    @media (min-width:820px){ .guides-grid{ grid-template-columns:1fr 1fr; } }
+    .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); }
+    .guide-card:hover { background:rgba(0,0,0,.03) }
+    .guide-meta { font-size:12px; color:var(--muted,#6b7280); margin:6px 0 0; }
+  </style>
 </head>
 <body>
   <header class="site-header">
@@ -23,7 +74,7 @@
         <span class="logo-dot"></span>
         <span>Hullify</span>
       </div>
-      <nav class="nav-links">
+      <nav class="nav-links" aria-label="Primary">
         <a href="index.html" class="active">Home</a>
         <a href="estimate.html">Estimate</a>
         <a href="#reviews">Reviews</a>
@@ -33,15 +84,12 @@
     </div>
   </header>
 
-  <script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
+  <!-- (kept) Vercel insights duplicate block from your file -->
+  <script>window.va = window.va || function(){(window.vaq = window.vaq || []).push(arguments);};</script>
+  <script defer src="/_vercel/insights/script.js"></script>
 
-  
-  
   <main>
-    <!-- HERO -->
+    <!-- HERO (kept) -->
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-copy">
@@ -58,7 +106,7 @@
           </div>
         </div>
 
-        <!-- QUICK ESTIMATE (blurred inputs, CTA works) -->
+        <!-- QUICK ESTIMATE (kept) -->
         <div class="hero-card">
           <div class="card">
             <h3>Quick Estimate</h3>
@@ -86,7 +134,7 @@
       </div>
     </section>
 
-    <!-- HOW IT WORKS -->
+    <!-- HOW IT WORKS (kept) -->
     <section id="how" class="how">
       <div class="container">
         <h2>How it works</h2>
@@ -110,7 +158,24 @@
       </div>
     </section>
 
-    <!-- REVIEWS -->
+    <!-- NEW: highlight your guides for internal linking -->
+    <section class="container guides" aria-label="Popular guides">
+      <h2>Popular guides</h2>
+      <div class="guides-grid">
+        <a class="guide-card card" href="selling-tips.html">
+          <h3>Boat Selling Tips (2025): Price Right, Sell Faster</h3>
+          <p>Pricing bands, timing, prep, standout photos, quick video, listing formula, and safe messaging.</p>
+          <p class="guide-meta">Read time: 6–8 min</p>
+        </a>
+        <a class="guide-card card" href="DockingGuide.html">
+          <h3>Beginner’s Guide to Docking a Boat</h3>
+          <p>Approach angles, gear “bursts,” crew signals, spring line first, and clean departures.</p>
+          <p class="guide-meta">Read time: 5–7 min</p>
+        </a>
+      </div>
+    </section>
+
+    <!-- REVIEWS (kept) -->
     <section id="reviews" class="reviews">
       <div class="container">
         <h2>Loved by boat owners</h2>
@@ -143,7 +208,7 @@
       </div>
     </section>
 
-    <!-- FAQ (still available on page, but no longer in top nav) -->
+    <!-- FAQ (kept) -->
     <section id="faq" class="faq">
       <div class="container">
         <h2>FAQ</h2>
@@ -169,6 +234,7 @@
       <div class="footer-links">
         <a href="index.html">Home</a>
         <a href="estimate.html">Estimate</a>
+        <a href="boating-hacks.html">Boating Hacks</a>
       </div>
     </div>
   </footer>
