@@ -4,8 +4,8 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <title>Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes | Hullify</title>
-  <meta name="description" content="Learn the sailing fundamentals: points of sail, sail trim with telltales, how to tack and gybe step-by-step, reef early, heave-to, right-of-way rules, and a pre-sail checklist."/>
+  <title>Sailboats 101 — Sailing Checklist: Trim, Tacks & Gybes | Hullify</title>
+  <meta name="description" content="Printable sailing checklist covering pre-sail prep, trim and points of sail, step-by-step tacks and gybes, reef early, heave-to, right-of-way, and post-sail wrap-up."/>
 
   <link rel="canonical" href="https://hullify.com/Sailboats.html"/>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
@@ -13,22 +13,22 @@
 
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="article">
-  <meta property="og:title" content="Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes">
-  <meta property="og:description" content="Points of sail, trim with telltales, tacking & gybing, reefing, heaving-to, and right-of-way—clear steps and checklists.">
+  <meta property="og:title" content="Sailboats 101 — Sailing Checklist: Trim, Tacks & Gybes">
+  <meta property="og:description" content="Tick through a calm sailing checklist: pre-sail, trim, tacks, gybes, reefing, heave-to, right-of-way, and post-sail.">
   <meta property="og:url" content="https://hullify.com/Sailboats.html">
   <meta property="og:image" content="https://hullify.com/images/og-sailing.jpg">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes">
-  <meta name="twitter:description" content="A calm intro to sailing: what to do, when, and why.">
+  <meta name="twitter:title" content="Sailboats 101 — Sailing Checklist: Trim, Tacks & Gybes">
+  <meta name="twitter:description" content="An interactive, printable sailing checklist to make each trip smoother.">
   <meta name="twitter:image" content="https://hullify.com/images/og-sailing.jpg">
 
-  <!-- JSON-LD: Article + Breadcrumbs -->
+  <!-- JSON-LD -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@type":"Article",
-    "headline":"Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes",
-    "description":"Learn the sailing fundamentals: points of sail, trim with telltales, tack and gybe step-by-step, reef early, heave-to, right-of-way rules, and a pre-sail checklist.",
+    "headline":"Sailboats 101 — Sailing Checklist: Trim, Tacks & Gybes",
+    "description":"Interactive sailing checklist: pre-sail prep, trim and points of sail, tacks, gybes, reef early, heave-to, right-of-way, and post-sail wrap-up.",
     "author":{"@type":"Organization","name":"Hullify"},
     "publisher":{"@type":"Organization","name":"Hullify"},
     "datePublished":"2025-09-04",
@@ -43,25 +43,39 @@
     "itemListElement":[
       {"@type":"ListItem","position":1,"name":"Home","item":"https://hullify.com/"},
       {"@type":"ListItem","position":2,"name":"Boating Hacks","item":"https://hullify.com/boating-hacks.html"},
-      {"@type":"ListItem","position":3,"name":"Sailboats 101"}
+      {"@type":"ListItem","position":3,"name":"Sailboats 101 — Checklist"}
     ]
   }
   </script>
 
   <style>
-    .toc-card { padding:14px 16px; border:1px solid var(--border); border-radius:12px; background: var(--surface, #fff); }
-    .toc-eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted,#6b7280); margin:0 0 6px; }
-    .steps { list-style:none; margin:0; padding:0; }
-    .steps li { border-top:1px solid var(--border); }
-    .steps li:first-child { border-top:0; }
-    .steps a { display:flex; align-items:center; gap:12px; padding:10px 2px; text-decoration:none; color:inherit; }
-    .steps a:hover { background: rgba(0,0,0,.04); border-radius:8px; }
-    .step-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; background: rgba(0, 92, 255, .10); color: var(--primary,#0b5cff); border:1px solid rgba(0,0,0,.06); flex:0 0 28px; }
-    .steps-section > .card.big { margin-top:16px; }
-    .steps-section > .card.big:first-child { margin-top:0; }
-    .card.big, .page-header { scroll-margin-top: 80px; }
-    .note { font-size: 0.95rem; color: var(--muted,#6b7280); }
-    .checklist li { margin: 6px 0; }
+    /* Page-local styles to make the checklist crisp and readable */
+    .toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0 0; }
+    .toolbar .btn { padding:10px 12px; border:1px solid var(--border); background:#fff; border-radius:10px; cursor:pointer; }
+    .toolbar .btn:hover { background: rgba(0,0,0,.03); }
+    .progress-wrap { display:flex; align-items:center; gap:10px; margin:12px 0 0; }
+    .progress-bar { height:8px; background:rgba(0,0,0,.08); border-radius:999px; flex:1; overflow:hidden; }
+    .progress-fill { height:100%; width:0%; background:var(--primary,#0b5cff); transition:width .2s ease; }
+    .progress-text { font-size:12px; color:var(--muted,#6b7280); }
+
+    .group { padding:16px; border:1px solid var(--border); border-radius:12px; background:var(--surface,#fff); margin-top:14px; }
+    .group h2 { margin:0 0 8px; }
+    .items { list-style:none; padding:0; margin:0; display:grid; grid-template-columns:1fr; gap:8px; }
+    @media (min-width:820px){ .items { grid-template-columns: 1fr 1fr; } }
+    .item { display:flex; gap:10px; align-items:flex-start; background:rgba(0,0,0,.02); padding:10px 12px; border-radius:10px; }
+    .item input[type="checkbox"]{ width:18px; height:18px; margin-top:2px; }
+    .item label { flex:1; cursor:pointer; }
+    .note { font-size: 12px; color: var(--muted,#6b7280); margin-top:6px; }
+    .muted-strong { font-weight:600; color: var(--muted,#6b7280); }
+
+    .cta-inline { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:10px; }
+    .print-only { display:none; }
+    @media print {
+      header, footer, .toolbar, .cta-inline { display:none !important; }
+      .print-only { display:block; }
+      body { background:#fff; }
+      .group { break-inside: avoid; }
+    }
   </style>
 </head>
 <body>
@@ -83,113 +97,125 @@
 
   <main class="estimate-page">
     <section class="container page-header">
-      <h1>Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes</h1>
-      <p class="muted">A calm intro to sailing: how the wind moves your boat, what each line does, and exactly how to tack, gybe, reef, and stop the boat safely.</p>
+      <h1>Sailboats 101 — Interactive Sailing Checklist</h1>
+      <p class="muted">Tick through a simple, repeatable sequence for a smooth day under sail. Progress saves in your browser automatically.</p>
+
+      <div class="toolbar">
+        <button id="printBtn" class="btn" type="button" aria-label="Print checklist">🖨️ Print</button>
+        <button id="resetBtn" class="btn" type="button" aria-label="Clear all checks">↺ Clear checks</button>
+        <span class="muted-strong" id="totalCount">0 of 0 complete</span>
+      </div>
+
+      <div class="progress-wrap" aria-live="polite">
+        <div class="progress-bar" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
+        <div class="progress-text" id="progressText">0%</div>
+      </div>
+      <p class="print-only note">Tip: keep this page in your nav tablet; progress will save on your next visit.</p>
     </section>
 
-    <!-- On this page -->
-    <section class="container" role="navigation" aria-label="On this page">
-      <div class="toc-card card">
-        <p class="toc-eyebrow">On this page</p>
-        <ol class="steps">
-          <li><a href="#rig" data-scroll><span class="step-badge">1</span><span>Rig basics: parts & lines</span></a></li>
-          <li><a href="#points" data-scroll><span class="step-badge">2</span><span>Points of sail & the no-go zone</span></a></li>
-          <li><a href="#trim" data-scroll><span class="step-badge">3</span><span>Sail trim with telltales</span></a></li>
-          <li><a href="#tack" data-scroll><span class="step-badge">4</span><span>How to tack (step-by-step)</span></a></li>
-          <li><a href="#gybe" data-scroll><span class="step-badge">5</span><span>How to gybe (safe & controlled)</span></a></li>
-          <li><a href="#reef" data-scroll><span class="step-badge">6</span><span>Reef early + heave-to</span></a></li>
-          <li><a href="#row" data-scroll><span class="step-badge">7</span><span>Right-of-way essentials</span></a></li>
-          <li><a href="#checklist" data-scroll><span class="step-badge">8</span><span>Pre-sail checklist</span></a></li>
-        </ol>
-      </div>
+    <!-- GROUP 1 -->
+    <section class="container group" role="group" aria-labelledby="pre">
+      <h2 id="pre">1) Pre-Sail & Rig Check</h2>
+      <ul class="items">
+        <li class="item"><input id="c-pre-1" type="checkbox"><label for="c-pre-1">PFDs for all; kids sized correctly; throwable aboard.</label></li>
+        <li class="item"><input id="c-pre-2" type="checkbox"><label for="c-pre-2">VHF on <strong>Ch.16</strong>; float plan filed (who/route/ETA).</label></li>
+        <li class="item"><input id="c-pre-3" type="checkbox"><label for="c-pre-3">Weather/tide reviewed; storm & fog plan ready.</label></li>
+        <li class="item"><input id="c-pre-4" type="checkbox"><label for="c-pre-4">Halyards run free; sheets flaked; winch handles aboard.</label></li>
+        <li class="item"><input id="c-pre-5" type="checkbox"><label for="c-pre-5">Reefing lines led; test hoist/lower; mainsail slides/bolt rope free.</label></li>
+        <li class="item"><input id="c-pre-6" type="checkbox"><label for="c-pre-6">Standing rigging visual check: pins/seizing, no broken wires.</label></li>
+        <li class="item"><input id="c-pre-7" type="checkbox"><label for="c-pre-7">Navigation lights & horn OK; anchor & rode ready.</label></li>
+        <li class="item"><input id="c-pre-8" type="checkbox"><label for="c-pre-8">Engine/kill switch functional; fuel and bilge check.</label></li>
+        <li class="item"><input id="c-pre-9" type="checkbox"><label for="c-pre-9">Tools/spares: knife, tape, shackles, tape ties, flashlight.</label></li>
+        <li class="item"><input id="c-pre-10" type="checkbox"><label for="c-pre-10">Crew brief: boom arc, hand/feet safety, roles.</label></li>
+      </ul>
+      <p class="note">Lower sails before entering any marina fairway—motor in/out is standard.</p>
     </section>
 
-    <!-- Content -->
-    <section class="container steps-section">
-      <div id="rig" class="card big">
-        <h2 style="margin-top:0;">1) Rig Basics: Parts & Lines</h2>
-        <p><strong>Standing rigging</strong> holds the mast up (shrouds, stays). <strong>Running rigging</strong> moves sails (halyards raise, sheets trim, vang/kicker controls boom downforce, traveler moves boom sideways, outhaul & cunningham/halyard control sail shape).</p>
-        <p class="note">Common rigs: <em>sloop</em> (most popular), <em>cat rig</em> (single sail), <em>ketch</em>/<em>yawl</em> (two masts). Learn your boat’s reef points and traveler position.</p>
-      </div>
-
-      <div id="points" class="card big">
-        <h2>2) Points of Sail & the No-Go Zone</h2>
-        <ul>
-          <li><strong>No-go zone:</strong> ~35–45° either side of the wind; sails luff.</li>
-          <li><strong>Close-hauled → Close reach → Beam reach → Broad reach → Run.</strong></li>
-          <li>Turn <em>toward</em> the wind to slow (luff), <em>away</em> from the wind to power up.</li>
-        </ul>
-        <p class="note">Watch ripples and flags. Keep apparent wind in mind as speed builds.</p>
-      </div>
-
-      <div id="trim" class="card big">
-        <h2>3) Sail Trim with Telltales</h2>
-        <ul>
-          <li><strong>Rule:</strong> Trim in until luffing just stops; if the inside telltale lifts, trim a touch; if the outside flutters, ease a touch.</li>
-          <li><strong>Power vs control:</strong> Traveler for angle, sheet for twist; vang flattens leech downwind; outhaul/cunningham flatten in breeze.</li>
-          <li><strong>Heel control:</strong> Ease sheets or traveler, reef early, and steer up in gusts.</li>
-        </ul>
-      </div>
-
-      <div id="tack" class="card big">
-        <h2>4) How to Tack (Step-by-Step)</h2>
-        <ol>
-          <li>Call: <em>“Ready about?”</em> Crew replies: <em>“Ready.”</em></li>
-          <li>Helm: push tiller <em>to leeward</em> (or turn wheel into the wind); boat passes head-to-wind.</li>
-          <li>Jib: release working sheet as sail luffs; trim the new sheet smoothly as it fills.</li>
-          <li>Main: centerline through the wind, then ease to the new close-hauled angle.</li>
-          <li>Steer a few seconds to build speed before trimming tight.</li>
-        </ol>
-      </div>
-
-      <div id="gybe" class="card big">
-        <h2>5) How to Gybe (Safe & Controlled)</h2>
-        <ol>
-          <li>Call: <em>“Stand by to gybe.”</em> Bring the boat onto a deep reach; <strong>control the boom</strong> (sheet in slightly).</li>
-          <li>Turn gently through the wind from astern; as the main crosses, ease sheet out under control.</li>
-          <li>Use a <em>preventer</em> on longer downwind legs to avoid accidental gybes (but release before turns).</li>
-        </ol>
-        <p class="note">Keep crew low and clear of the boom arc.</p>
-      </div>
-
-      <div id="reef" class="card big">
-        <h2>6) Reef Early + Heave-To</h2>
-        <ul>
-          <li><strong>Reef before you need to:</strong> add a reef when heel >20° or handling feels sketchy.</li>
-          <li><strong>Heave-to:</strong> tack without releasing the jib, center/secure the tiller to windward, ease main—boat settles calmly for breaks or heavy weather.</li>
-        </ul>
-      </div>
-
-      <div id="row" class="card big">
-        <h2>7) Right-of-Way Essentials</h2>
-        <ul>
-          <li>Power generally gives way to sail, but <em>not</em> if sailboat is overtaking or restricted vessels are involved.</li>
-          <li><strong>Port vs starboard tack:</strong> Starboard-tack boat stands on; port-tack keeps clear.</li>
-          <li><strong>Leeward over windward</strong> on same tack; overtaking boat keeps clear.</li>
-          <li>Maintain a lookout and avoid collisions regardless of “rights.”</li>
-        </ul>
-      </div>
-
-      <div id="checklist" class="card big">
-        <h2>8) Pre-Sail Checklist</h2>
-        <ul class="checklist">
-          <li>PFDs for all; <a href="Safety-Tips.html">kill switch & first-aid</a> aboard; VHF on Ch. 16.</li>
-          <li>Rig check: halyards run free, shackles secure, battens/slug in, reef lines led.</li>
-          <li>Forecast & tide reviewed; float plan filed; nav lights functional.</li>
-          <li>Practice <em>tack</em>, <em>gybe</em>, and <em>heave-to</em> in open water before crowded areas.</li>
-        </ul>
-        <p class="note">Motoring in/out of marinas is standard—drop sails outside the fairway.</p>
-      </div>
+    <!-- GROUP 2 -->
+    <section class="container group" role="group" aria-labelledby="trim">
+      <h2 id="trim">2) Get Underway & Trim</h2>
+      <ul class="items">
+        <li class="item"><input id="c-trim-1" type="checkbox"><label for="c-trim-1">Identify true wind (flags/ripples) and choose point of sail.</label></li>
+        <li class="item"><input id="c-trim-2" type="checkbox"><label for="c-trim-2">Traveler set; ease or center as breeze builds.</label></li>
+        <li class="item"><input id="c-trim-3" type="checkbox"><label for="c-trim-3">Trim main until luffing stops; adjust twist with sheet/vang.</label></li>
+        <li class="item"><input id="c-trim-4" type="checkbox"><label for="c-trim-4">Jib telltales: inside lifts → trim in; outside flutters → ease.</label></li>
+        <li class="item"><input id="c-trim-5" type="checkbox"><label for="c-trim-5">Keep heel under ~20°; ease traveler/sheets in gusts.</label></li>
+        <li class="item"><input id="c-trim-6" type="checkbox"><label for="c-trim-6">Maintain a proper lookout; avoid traffic & shoals.</label></li>
+        <li class="item"><input id="c-trim-7" type="checkbox"><label for="c-trim-7">Hydrate & sunscreen; keep deck tidy and lines tailed.</label></li>
+        <li class="item"><input id="c-trim-8" type="checkbox"><label for="c-trim-8">Balance helm: small weather helm is okay, not fighty.</label></li>
+      </ul>
     </section>
 
-    <!-- Bottom CTA -->
-    <section class="estimate-section" style="margin-top:18px;">
-      <div class="container cta-strip">
-        <div>
-          <h2 style="margin:0;">Planning sail upgrades?</h2>
-          <p class="muted" style="margin:4px 0 0;">Get a quick estimate to budget for new sails, running rigging, or electronics.</p>
-        </div>
-        <a class="btn btn-primary" href="estimate.html">Get My Instant Estimate</a>
+    <!-- GROUP 3 -->
+    <section class="container group" role="group" aria-labelledby="tack">
+      <h2 id="tack">3) Tack — Step-by-Step</h2>
+      <ul class="items">
+        <li class="item"><input id="c-tack-1" type="checkbox"><label for="c-tack-1">Call: “Ready about?” — crew confirms “Ready.”</label></li>
+        <li class="item"><input id="c-tack-2" type="checkbox"><label for="c-tack-2">Helm turns into wind (tiller to leeward / wheel to wind).</label></li>
+        <li class="item"><input id="c-tack-3" type="checkbox"><label for="c-tack-3">Jib: release old sheet as it luffs; trim new sheet smoothly.</label></li>
+        <li class="item"><input id="c-tack-4" type="checkbox"><label for="c-tack-4">Main passes centerline; ease to new close-hauled angle.</label></li>
+        <li class="item"><input id="c-tack-5" type="checkbox"><label for="c-tack-5">Steer straight to build speed; fine-tune trim.</label></li>
+      </ul>
+    </section>
+
+    <!-- GROUP 4 -->
+    <section class="container group" role="group" aria-labelledby="gybe">
+      <h2 id="gybe">4) Gybe — Controlled & Safe</h2>
+      <ul class="items">
+        <li class="item"><input id="c-gybe-1" type="checkbox"><label for="c-gybe-1">Call: “Stand by to gybe.” Bring to a deep reach.</label></li>
+        <li class="item"><input id="c-gybe-2" type="checkbox"><label for="c-gybe-2">Sheet main in slightly to control boom.</label></li>
+        <li class="item"><input id="c-gybe-3" type="checkbox"><label for="c-gybe-3">Turn smoothly through dead downwind; hands/heads clear.</label></li>
+        <li class="item"><input id="c-gybe-4" type="checkbox"><label for="c-gybe-4">Ease main on the new side; stabilize course.</label></li>
+        <li class="item"><input id="c-gybe-5" type="checkbox"><label for="c-gybe-5">Use/remove preventer appropriately (never when turning).</label></li>
+      </ul>
+    </section>
+
+    <!-- GROUP 5 -->
+    <section class="container group" role="group" aria-labelledby="reef">
+      <h2 id="reef">5) Reef Early — Stay in Control</h2>
+      <ul class="items">
+        <li class="item"><input id="c-reef-1" type="checkbox"><label for="c-reef-1">Heel > ~20° or handling sketchy? Add a reef now.</label></li>
+        <li class="item"><input id="c-reef-2" type="checkbox"><label for="c-reef-2">Head up; ease main; lower halyard to reef mark.</label></li>
+        <li class="item"><input id="c-reef-3" type="checkbox"><label for="c-reef-3">Tack/clew reef lines secured; re-tension halyard.</label></li>
+        <li class="item"><input id="c-reef-4" type="checkbox"><label for="c-reef-4">Check luff/leech tension; tidy lines; resume course.</label></li>
+      </ul>
+    </section>
+
+    <!-- GROUP 6 -->
+    <section class="container group" role="group" aria-labelledby="heave">
+      <h2 id="heave">6) Heave-To — Controlled Stop</h2>
+      <ul class="items">
+        <li class="item"><input id="c-heave-1" type="checkbox"><label for="c-heave-1">Tack without releasing jib; backwind it.</label></li>
+        <li class="item"><input id="c-heave-2" type="checkbox"><label for="c-heave-2">Tiller/wheel to windward and secure.</label></li>
+        <li class="item"><input id="c-heave-3" type="checkbox"><label for="c-heave-3">Ease main; confirm gentle drift; take your break.</label></li>
+      </ul>
+    </section>
+
+    <!-- GROUP 7 -->
+    <section class="container group" role="group" aria-labelledby="row">
+      <h2 id="row">7) Right-of-Way — Quick Checks</h2>
+      <ul class="items">
+        <li class="item"><input id="c-row-1" type="checkbox"><label for="c-row-1">On starboard tack? Stand on (still avoid collision).</label></li>
+        <li class="item"><input id="c-row-2" type="checkbox"><label for="c-row-2">Same tack: leeward stands on; windward keeps clear.</label></li>
+        <li class="item"><input id="c-row-3" type="checkbox"><label for="c-row-3">Overtaking keeps clear (sail or power).</label></li>
+        <li class="item"><input id="c-row-4" type="checkbox"><label for="c-row-4">Channels/no-wake obeyed; restricted vessels get room.</label></li>
+      </ul>
+      <p class="note">Rule one: avoid collisions—rights never excuse contact.</p>
+    </section>
+
+    <!-- GROUP 8 -->
+    <section class="container group" role="group" aria-labelledby="post">
+      <h2 id="post">8) Return & Post-Sail</h2>
+      <ul class="items">
+        <li class="item"><input id="c-post-1" type="checkbox"><label for="c-post-1">Lower sails outside fairway; motor in under control.</label></li>
+        <li class="item"><input id="c-post-2" type="checkbox"><label for="c-post-2">Flake sails; sheets/halyards secured; boom strapped.</label></li>
+        <li class="item"><input id="c-post-3" type="checkbox"><label for="c-post-3">Covers on; lines coiled; cabin & lockers tidy/dry.</label></li>
+        <li class="item"><input id="c-post-4" type="checkbox"><label for="c-post-4">Quick rig scan for wear; note fixes; rinse saltwater.</label></li>
+        <li class="item"><input id="c-post-5" type="checkbox"><label for="c-post-5">Log times, wind, any issues for next outing.</label></li>
+      </ul>
+
+      <div class="cta-inline">
+        <a class="btn btn-primary" href="estimate.html">Plan sail upgrades — Get My Estimate</a>
       </div>
     </section>
   </main>
@@ -206,18 +232,45 @@
   </footer>
 
   <script>
-    document.getElementById("year").textContent = new Date().getFullYear();
-    // Smooth in-page scrolling
-    document.querySelectorAll('a[data-scroll]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href');
-        if (id && id.startsWith('#')) {
-          e.preventDefault();
-          const el = document.querySelector(id);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
+    // Persist & track progress
+    const STORAGE_KEY = 'hullify_sailing_checklist_v1';
+    const $ = s => document.querySelector(s);
+    const $$ = s => Array.from(document.querySelectorAll(s));
+    const boxes = $$('input[type="checkbox"]');
+    const totalEl = $('#totalCount');
+    const fill = $('#progressFill');
+    const pct = $('#progressText');
+
+    function saveState(){
+      const state = {};
+      boxes.forEach(b => state[b.id] = b.checked);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+    function loadState(){
+      try {
+        const state = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+        boxes.forEach(b => { if (state[b.id]) b.checked = true; });
+      } catch(e){}
+      updateProgress();
+    }
+    function updateProgress(){
+      const done = boxes.filter(b => b.checked).length;
+      const total = boxes.length;
+      const percent = total ? Math.round((done/total)*100) : 0;
+      totalEl.textContent = `${done} of ${total} complete`;
+      fill.style.width = percent + '%';
+      pct.textContent = percent + '%';
+    }
+
+    boxes.forEach(b => b.addEventListener('change', () => { saveState(); updateProgress(); }));
+    $('#resetBtn').addEventListener('click', () => {
+      boxes.forEach(b => b.checked = false);
+      saveState(); updateProgress();
     });
+    $('#printBtn').addEventListener('click', () => window.print());
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+    loadState();
   </script>
 </body>
 </html>
