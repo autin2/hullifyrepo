@@ -45,14 +45,36 @@
   }
   </script>
 
-  <!-- Page-local layout helpers -->
   <style>
     .types-grid { display:grid; grid-template-columns:1fr; gap:16px; }
     @media (min-width: 900px){ .types-grid { grid-template-columns: 1fr 1fr; } }
 
     .boat-card { border:1px solid var(--border); border-radius:12px; background:var(--surface,#fff); overflow:hidden; }
-    .boat-media { aspect-ratio: 16/9; background: linear-gradient(135deg, #e8eefc, #f5f7fb); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border); }
-    .boat-media img { width:100%; height:100%; object-fit:cover; display:block; }
+    .boat-media {
+      position: relative;
+      aspect-ratio: 16/9;
+      background: linear-gradient(135deg, #e8eefc, #f5f7fb);
+      border-bottom:1px solid var(--border);
+      overflow:hidden;
+    }
+    .boat-media img{
+      width:100%;
+      height:100%;
+      display:block;
+      object-fit: cover;            /* default = cropped nicely */
+      object-position: var(--posX, 50%) var(--posY, 55%); /* show a bit more sky by default */
+      image-rendering: auto;
+    }
+    /* If the image is portrait/tall, favor the top so masts don’t get chopped */
+    .boat-media.tall img{ object-position: var(--posX, 50%) var(--posY, 20%); }
+    /* Manual overrides via data-fit or data-focus */
+    .boat-media.contain img{ object-fit: contain; background:#f0f2f5; }
+    .boat-media[data-focus="top"]    img{ --posY: 15%; }
+    .boat-media[data-focus="center"] img{ --posY: 50%; }
+    .boat-media[data-focus="bottom"] img{ --posY: 85%; }
+    .boat-media[data-focus="left"]   img{ --posX: 15%; }
+    .boat-media[data-focus="right"]  img{ --posX: 85%; }
+
     .boat-body { padding:14px 16px; }
     .boat-body h2 { margin:0 0 6px; font-size:1.25rem; }
     .tags { display:flex; flex-wrap:wrap; gap:6px; margin:6px 0 10px; }
@@ -60,33 +82,19 @@
     .bullets { margin:0; padding-left:18px; }
     .bullets li { margin:4px 0; }
     .cta { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-    .img-note { font-size:12px; color:var(--muted,#6b7280); text-align:left; padding:6px 0 0; }
+    .img-note { font-size:12px; color:var(--muted,#6b7280); padding:6px 0 0; }
 
     /* Floating back-to-top button */
     #backTop {
-      position: fixed;
-      right: 22px;
-      bottom: 22px;
-      width: 46px;
-      height: 46px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: #fff;
-      display: grid;
-      place-items: center;
-      cursor: pointer;
+      position: fixed; right: 22px; bottom: 22px; width: 46px; height: 46px;
+      border-radius: 999px; border: 1px solid var(--border); background: #fff;
+      display: grid; place-items: center; cursor: pointer;
       box-shadow: 0 6px 20px rgba(0,0,0,.12);
-      opacity: 0;
-      visibility: hidden;
-      transform: translateY(8px);
+      opacity: 0; visibility: hidden; transform: translateY(8px);
       transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
       z-index: 50;
     }
-    #backTop.show {
-      opacity: 1;
-      visibility: visible;
-      transform: translateY(0);
-    }
+    #backTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
     #backTop:hover { background: rgba(0,0,0,.03); }
     #backTop span { font-size: 20px; line-height: 1; }
   </style>
@@ -116,16 +124,14 @@
 
     <!-- Types -->
     <section class="container types-grid">
-      <!-- CATAMARAN -->
+      <!-- CATAMARAN (portrait photos often benefit from top focus) -->
       <article id="catamaran" class="boat-card">
-        <figure class="boat-media">
-          <img src="type-catamaran.png" alt="Sailing catamaran with twin hulls underway" loading="lazy" width="1200" height="675">
+        <figure class="boat-media" data-focus="top">
+          <img src="type-catamaran.png" alt="Sailing catamaran with twin hulls underway" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Catamaran</h2>
-          <div class="tags">
-            <span class="tag">Stable</span><span class="tag">Family</span><span class="tag">Overnight</span><span class="tag">Sailing</span>
-          </div>
+          <div class="tags"><span class="tag">Stable</span><span class="tag">Family</span><span class="tag">Overnight</span><span class="tag">Sailing</span></div>
           <ul class="bullets">
             <li>Two hulls = wide deck space and low heel angle; great for kids and comfort.</li>
             <li>Shallow draft for beaches/sandbars; big saloon on larger cats.</li>
@@ -141,13 +147,11 @@
       <!-- CENTER CONSOLE -->
       <article id="center-console" class="boat-card">
         <figure class="boat-media">
-          <img src="type-center-console.png" alt="Center console fishing boat with T-top" loading="lazy" width="1200" height="675">
+          <img src="type-center-console.png" alt="Center console fishing boat with T-top" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Center Console</h2>
-          <div class="tags">
-            <span class="tag">Fishing</span><span class="tag">All-around</span><span class="tag">Saltwater</span>
-          </div>
+          <div class="tags"><span class="tag">Fishing</span><span class="tag">All-around</span><span class="tag">Saltwater</span></div>
           <ul class="bullets">
             <li>Walk-around fishability with high freeboard and self-bailing deck.</li>
             <li>Single or twin outboards for speed and range; easy wash-down.</li>
@@ -163,20 +167,16 @@
       <!-- SPORTFISHER -->
       <article id="sportfisher" class="boat-card">
         <figure class="boat-media">
-          <img src="type-sportfisher.png" alt="Offshore sportfisher with tower running through chop" loading="lazy" width="1200" height="675">
+          <img src="type-sportfisher.png" alt="Offshore sportfisher with tower running through chop" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Sportfisher (Offshore)</h2>
-          <div class="tags">
-            <span class="tag">Offshore</span><span class="tag">Fishing</span><span class="tag">Diesel</span><span class="tag">Cabin</span>
-          </div>
+          <div class="tags"><span class="tag">Offshore</span><span class="tag">Fishing</span><span class="tag">Diesel</span><span class="tag">Cabin</span></div>
           <ul class="bullets">
             <li>Deep-V hulls, long range, towers, outriggers—built to chase pelagics.</li>
             <li>Comfortable cabins for overnights; higher fuel/maintenance costs.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-sportfisher.png</code></p>
         </div>
       </article>
@@ -184,20 +184,16 @@
       <!-- BOWRIDER -->
       <article id="bowrider" class="boat-card">
         <figure class="boat-media">
-          <img src="type-bowrider.png" alt="Bowrider runabout with open seating in the bow" loading="lazy" width="1200" height="675">
+          <img src="type-bowrider.png" alt="Bowrider runabout with open seating in the bow" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Bowrider</h2>
-          <div class="tags">
-            <span class="tag">Family</span><span class="tag">Lakes</span><span class="tag">Day boating</span>
-          </div>
+          <div class="tags"><span class="tag">Family</span><span class="tag">Lakes</span><span class="tag">Day boating</span></div>
           <ul class="bullets">
             <li>Open bow seating = social layout; easy trailer & storage sizes.</li>
             <li>Good for tubing and coves; not ideal for big offshore days.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-bowrider.png</code></p>
         </div>
       </article>
@@ -205,20 +201,16 @@
       <!-- PONTOON -->
       <article id="pontoon" class="boat-card">
         <figure class="boat-media">
-          <img src="type-pontoon.png" alt="Pontoon boat with bimini and lounge seating" loading="lazy" width="1200" height="675">
+          <img src="type-pontoon.png" alt="Pontoon boat with bimini and lounge seating" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Pontoon</h2>
-          <div class="tags">
-            <span class="tag">Entertaining</span><span class="tag">Calm water</span><span class="tag">Huge seating</span>
-          </div>
+          <div class="tags"><span class="tag">Entertaining</span><span class="tag">Calm water</span><span class="tag">Huge seating</span></div>
           <ul class="bullets">
             <li>Massive deck space; simple operation and low draft.</li>
             <li>Tri-toons add speed and rough-water capability.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-pontoon.png</code></p>
         </div>
       </article>
@@ -226,20 +218,16 @@
       <!-- CABIN CRUISER -->
       <article id="cabin-cruiser" class="boat-card">
         <figure class="boat-media">
-          <img src="type-cabin-cruiser.png" alt="Cabin cruiser at anchor with hardtop" loading="lazy" width="1200" height="675">
+          <img src="type-cabin-cruiser.png" alt="Cabin cruiser at anchor with hardtop" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Cabin Cruiser</h2>
-          <div class="tags">
-            <span class="tag">Overnight</span><span class="tag">Comfort</span><span class="tag">Family</span>
-          </div>
+          <div class="tags"><span class="tag">Overnight</span><span class="tag">Comfort</span><span class="tag">Family</span></div>
           <ul class="bullets">
             <li>V-berth, galley, enclosed head; perfect for weekend trips.</li>
             <li>Heavier and thirstier—budget for dockage and upkeep.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-cabin-cruiser.png</code></p>
         </div>
       </article>
@@ -247,20 +235,16 @@
       <!-- TRAWLER -->
       <article id="trawler" class="boat-card">
         <figure class="boat-media">
-          <img src="type-trawler.png" alt="Displacement trawler cruising with flybridge" loading="lazy" width="1200" height="675">
+          <img src="type-trawler.png" alt="Displacement trawler cruising with flybridge" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Trawler</h2>
-          <div class="tags">
-            <span class="tag">Long range</span><span class="tag">Fuel-efficient</span><span class="tag">Liveaboard</span>
-          </div>
+          <div class="tags"><span class="tag">Long range</span><span class="tag">Fuel-efficient</span><span class="tag">Liveaboard</span></div>
           <ul class="bullets">
             <li>Slow and steady diesel cruiser; huge range and comfort.</li>
             <li>Great for the ICW and extended trips; not a speed boat.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-trawler.png</code></p>
         </div>
       </article>
@@ -268,20 +252,16 @@
       <!-- RIB -->
       <article id="rib" class="boat-card">
         <figure class="boat-media">
-          <img src="type-rib.png" alt="Rigid inflatable boat (RIB) with console and tubes" loading="lazy" width="1200" height="675">
+          <img src="type-rib.png" alt="Rigid inflatable boat (RIB) with console and tubes" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>RIB / Inflatable</h2>
-          <div class="tags">
-            <span class="tag">Tender</span><span class="tag">Rescue</span><span class="tag">Beachable</span>
-          </div>
+          <div class="tags"><span class="tag">Tender</span><span class="tag">Rescue</span><span class="tag">Beachable</span></div>
           <ul class="bullets">
             <li>Light, stable, beach-friendly; common as tenders and safety boats.</li>
             <li>Tubes can puncture—check fabric and seams when buying used.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-rib.png</code></p>
         </div>
       </article>
@@ -289,20 +269,16 @@
       <!-- WAKE / SKI -->
       <article id="wakeboat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-wakeboat.png" alt="Wake boat with tower and surf wave" loading="lazy" width="1200" height="675">
+          <img src="type-wakeboat.png" alt="Wake boat with tower and surf wave" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Wake / Ski Boat</h2>
-          <div class="tags">
-            <span class="tag">Watersports</span><span class="tag">Ballast</span><span class="tag">Freshwater</span>
-          </div>
+          <div class="tags"><span class="tag">Watersports</span><span class="tag">Ballast</span><span class="tag">Freshwater</span></div>
           <ul class="bullets">
             <li>Inboard power with ballast to shape wakes/waves.</li>
             <li>Lake fun champ; not ideal for salt or long runs.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-wakeboat.png</code></p>
         </div>
       </article>
@@ -310,20 +286,16 @@
       <!-- BASS BOAT -->
       <article id="bass-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-bass-boat.png" alt="Bass boat with trolling motor and casting decks" loading="lazy" width="1200" height="675">
+          <img src="type-bass-boat.png" alt="Bass boat with trolling motor and casting decks" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Bass Boat</h2>
-          <div class="tags">
-            <span class="tag">Freshwater</span><span class="tag">Fishing</span><span class="tag">Fast</span>
-          </div>
+          <div class="tags"><span class="tag">Freshwater</span><span class="tag">Fishing</span><span class="tag">Fast</span></div>
           <ul class="bullets">
             <li>Low profile, big casting decks, livewells, and trolling motor.</li>
             <li>Best on lakes/rivers; low freeboard in chop.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-bass-boat.png</code></p>
         </div>
       </article>
@@ -331,20 +303,16 @@
       <!-- JON BOAT -->
       <article id="jon-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-jon-boat.png" alt="Light aluminum jon boat on a quiet river" loading="lazy" width="1200" height="675">
+          <img src="type-jon-boat.png" alt="Light aluminum jon boat on a quiet river" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Jon Boat</h2>
-          <div class="tags">
-            <span class="tag">Shallow</span><span class="tag">Budget</span><span class="tag">Utility</span>
-          </div>
+          <div class="tags"><span class="tag">Shallow</span><span class="tag">Budget</span><span class="tag">Utility</span></div>
           <ul class="bullets">
             <li>Flat bottom = super shallow draft for creeks and marshes.</li>
             <li>Simple, tough, easy to trailer; not for rough water.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-jon-boat.png</code></p>
         </div>
       </article>
@@ -352,20 +320,16 @@
       <!-- DECK BOAT -->
       <article id="deck-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-deck-boat.png" alt="Deck boat with wide bow seating underway" loading="lazy" width="1200" height="675">
+          <img src="type-deck-boat.png" alt="Deck boat with wide bow seating underway" loading="lazy" decoding="async" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Deck Boat</h2>
-          <div class="tags">
-            <span class="tag">Family</span><span class="tag">Space</span><span class="tag">All-around</span>
-          </div>
+          <div class="tags"><span class="tag">Family</span><span class="tag">Space</span><span class="tag">All-around</span></div>
           <ul class="bullets">
             <li>Hybrid of bowrider + pontoon: wide bow, lots of seating.</li>
             <li>Handles chop better than pontoons of similar size.</li>
           </ul>
-          <div class="cta">
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
-          </div>
+          <div class="cta"><a class="btn btn-primary" href="estimate.html">Get value estimate</a></div>
           <p class="img-note">Image file: <code>type-deck-boat.png</code></p>
         </div>
       </article>
@@ -373,9 +337,7 @@
   </main>
 
   <!-- Pretty floating Back to Top -->
-  <button id="backTop" aria-label="Back to top" title="Back to top">
-    <span>↑</span>
-  </button>
+  <button id="backTop" aria-label="Back to top" title="Back to top"><span>↑</span></button>
 
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -389,36 +351,27 @@
   </footer>
 
   <script>
-    // Smooth scroll for any # links (if you add some later)
-    document.querySelectorAll('a[data-scroll]').forEach(a => {
-      a.addEventListener('click', (e) => {
-        const id = a.getAttribute('href');
-        if (id && id.startsWith('#')) {
-          e.preventDefault();
-          const el = document.querySelector(id);
-          if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
+    // Auto-detect tall images and tweak framing so masts/headroom show
+    function setMediaClass(container, img){
+      const tall = img.naturalHeight > img.naturalWidth * 1.1;
+      container.classList.toggle('tall', tall);
+      if (img.dataset.fit === 'contain') container.classList.add('contain');
+    }
+    document.querySelectorAll('.boat-media img').forEach(img=>{
+      const container = img.closest('.boat-media');
+      if (img.complete) setMediaClass(container, img);
+      else img.addEventListener('load', ()=>setMediaClass(container, img));
     });
 
     // Floating Back to Top behavior
     const backTop = document.getElementById('backTop');
-    function toggleBackTop(){
-      if (window.scrollY > 400) {
-        backTop.classList.add('show');
-      } else {
-        backTop.classList.remove('show');
-      }
-    }
+    function toggleBackTop(){ (window.scrollY > 400) ? backTop.classList.add('show') : backTop.classList.remove('show'); }
     window.addEventListener('scroll', toggleBackTop);
-    backTop.addEventListener('click', () => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
+    backTop.addEventListener('click', ()=> window.scrollTo({ top: 0, behavior: 'smooth' }));
+    toggleBackTop();
 
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
-    // Initialize button state
-    toggleBackTop();
   </script>
 </body>
 </html>
