@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boating Hacks — Practical Tips & Guides | Hullify</title>
-  <meta name="description" content="A simple hub for practical boating guides. Read our Boat Selling Tips to price and sell faster, a calm Docking Guide to arrive stress-free, and Safety Tips to keep your crew prepared."/>
+  <meta name="description" content="A simple hub for practical boating guides: Selling Tips, a calm Docking Guide, essential Safety Tips, and the Best Food For Boating ideas with a cooler plan."/>
   <link rel="canonical" href="https://hullify.com/boating-hacks.html"/>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css"/>
@@ -12,12 +12,12 @@
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Boating Hacks — Practical Tips & Guides">
-  <meta property="og:description" content="Selling Tips, a Docking Guide, and essential Safety Tips—concise, calm, and actionable.">
+  <meta property="og:description" content="Selling Tips, Docking Guide, Safety Tips, and Boat Food ideas—concise, calm, and actionable.">
   <meta property="og:url" content="https://hullify.com/boating-hacks.html">
   <meta property="og:image" content="https://hullify.com/images/og-hacks.jpg">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Boating Hacks — Practical Tips & Guides">
-  <meta name="twitter:description" content="Practical guides to help you enjoy the water and decide confidently.">
+  <meta name="twitter:description" content="Practical guides to enjoy the water and decide confidently.">
   <meta name="twitter:image" content="https://hullify.com/images/og-hacks.jpg">
 
   <!-- JSON-LD: ItemList of guides -->
@@ -27,24 +27,10 @@
     "@type":"ItemList",
     "name":"Boating Hacks",
     "itemListElement":[
-      {
-        "@type":"ListItem",
-        "position":1,
-        "name":"Boat Selling Tips (2025): Price Right, Sell Faster",
-        "url":"https://hullify.com/selling-tips.html"
-      },
-      {
-        "@type":"ListItem",
-        "position":2,
-        "name":"Beginner’s Guide to Docking a Boat",
-        "url":"https://hullify.com/DockingGuide.html"
-      },
-      {
-        "@type":"ListItem",
-        "position":3,
-        "name":"Essential Boating Safety Tips",
-        "url":"https://hullify.com/Safety-Tips.html"
-      }
+      {"@type":"ListItem","position":1,"name":"Boat Selling Tips (2025): Price Right, Sell Faster","url":"https://hullify.com/selling-tips.html"},
+      {"@type":"ListItem","position":2,"name":"Beginner’s Guide to Docking a Boat","url":"https://hullify.com/DockingGuide.html"},
+      {"@type":"ListItem","position":3,"name":"Essential Boating Safety Tips","url":"https://hullify.com/Safety-Tips.html"},
+      {"@type":"ListItem","position":4,"name":"Best Food For Boating — Easy, No-Mess Ideas","url":"https://hullify.com/Best-Food-For-Boating.html"}
     ]
   }
   </script>
@@ -52,7 +38,8 @@
   <style>
     .hub-intro { margin-top: 6px; }
     .guides-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-    @media (min-width: 820px){ .guides-grid{ grid-template-columns: 1fr 1fr 1fr; } }
+    /* Exactly 3 per row on wider screens so the 4th wraps to a new line */
+    @media (min-width: 900px){ .guides-grid{ grid-template-columns: repeat(3, 1fr); } }
     .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); }
     .guide-card:hover { background: rgba(0,0,0,.03); }
     .guide-meta { font-size:12px; color:var(--muted,#6b7280); margin:6px 0 0; }
@@ -104,6 +91,13 @@
           <h3>Essential Boating Safety Tips</h3>
           <p>Pre-departure checklist, PFDs & kill switch, weather go/no-go, VHF & float plan, nav rules, night boating, and emergency basics—clear and printable.</p>
           <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
+        </a>
+
+        <!-- NEW: Food ideas guide (wraps to the next line because grid stays at 3 columns) -->
+        <a class="guide-card card" role="listitem" href="Best-Food-For-Boating.html">
+          <h3>Best Food For Boating — Easy, No-Mess Ideas</h3>
+          <p>Cooler plan + make-ahead mains, grab-and-go snacks, kid-friendly options, hydrating fruit, and safe-temp tips—zero crumbs, zero chaos.</p>
+          <p class="guide-meta">Read time: 5–7 min · Updated 2025</p>
         </a>
       </div>
     </section>
