@@ -3,31 +3,64 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
   <title>Beginner’s Guide to Docking a Boat (2025) — Hullify</title>
+  <meta name="description" content="A calm, step-by-step docking guide: prep fenders & lines, read wind/current, approach at 30–45°, short gear bursts, set a spring line first, crew signals, and clean departures.">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://hullify.com/DockingGuide.html"/>
+
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css"/>
-  <meta name="description" content="A calm, step-by-step docking guide: prep fenders & lines, read wind/current, approach at 30–45°, use short gear bursts, set a spring line first, and depart cleanly. Includes a printable checklist and common mistakes to avoid.">
 
-  <!-- Local styles just for this page -->
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Beginner’s Guide to Docking a Boat">
+  <meta property="og:description" content="Setup, angles, gear bursts, spring line first, signals, and wave-offs.">
+  <meta property="og:url" content="https://hullify.com/DockingGuide.html">
+  <meta property="og:image" content="https://hullify.com/images/og-docking-guide.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Beginner’s Guide to Docking a Boat">
+  <meta name="twitter:description" content="Make docking calm with a simple, repeatable plan.">
+  <meta name="twitter:image" content="https://hullify.com/images/og-docking-guide.jpg">
+
+  <!-- JSON-LD: Article + Breadcrumbs -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Article",
+    "headline":"Beginner’s Guide to Docking a Boat",
+    "description":"Step-by-step docking: prep, read wind/current, approach at 30–45°, short bursts, spring line first, signals, and clean departures.",
+    "author":{"@type":"Organization","name":"Hullify"},
+    "publisher":{"@type":"Organization","name":"Hullify"},
+    "datePublished":"2025-09-04",
+    "dateModified":"2025-09-04",
+    "mainEntityOfPage":{"@type":"WebPage","@id":"https://hullify.com/DockingGuide.html"}
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"BreadcrumbList",
+    "itemListElement":[
+      {"@type":"ListItem","position":1,"name":"Home","item":"https://hullify.com/"},
+      {"@type":"ListItem","position":2,"name":"Boating Hacks","item":"https://hullify.com/boating-hacks.html"},
+      {"@type":"ListItem","position":3,"name":"Beginner’s Guide to Docking a Boat"}
+    ]
+  }
+  </script>
+
   <style>
-    /* “On this page” card */
-    .toc-card { padding: 14px 16px; border:1px solid var(--border); border-radius:12px; background: var(--surface, #fff); }
+    .toc-card { padding:14px 16px; border:1px solid var(--border); border-radius:12px; background: var(--surface, #fff); }
     .toc-eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted,#6b7280); margin:0 0 6px; }
-    .steps { counter-reset: step; list-style:none; margin:0; padding:0; }
+    .steps { list-style:none; margin:0; padding:0; counter-reset:step; }
     .steps li { border-top:1px solid var(--border); }
     .steps li:first-child { border-top:0; }
     .steps a { display:flex; align-items:center; gap:12px; padding:10px 2px; text-decoration:none; color:inherit; }
     .steps a:hover { background: rgba(0,0,0,.04); border-radius:8px; }
-    .step-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700;
-      background: rgba(0, 92, 255, .10); color: var(--primary,#0b5cff); border:1px solid rgba(0,0,0,.06); flex:0 0 28px; }
-    .step-title { font-weight:600; }
-    .step-arrow { margin-left:auto; opacity:.45; }
-    /* Smooth anchor landing spacing under sticky header */
-    .card.big, .page-header { scroll-margin-top: 80px; }
-
-    /* Space between step cards like on Selling Tips */
-    .steps-section > .card.big { margin-top: 16px; }
-    .steps-section > .card.big:first-child { margin-top: 0; }
+    .step-badge { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; background: rgba(0, 92, 255, .10); color: var(--primary,#0b5cff); border:1px solid rgba(0,0,0,.06); flex:0 0 28px; }
+    .steps-section > .card.big { margin-top:16px; }
+    .steps-section > .card.big:first-child { margin-top:0; }
   </style>
 </head>
 <body>
@@ -37,13 +70,12 @@
         <span class="logo-dot"></span>
         <span>Hullify</span>
       </div>
-      <nav class="nav-links">
-  <a href="index.html">Home</a>
-  <a href="estimate.html">Estimate</a>
-  <a href="index.html#reviews">Reviews</a>
-  <a href="boating-hacks.html">Boating Hacks</a>
-</nav>
-
+      <nav class="nav-links" aria-label="Primary">
+        <a href="index.html">Home</a>
+        <a href="estimate.html">Estimate</a>
+        <a href="index.html#reviews">Reviews</a>
+        <a href="boating-hacks.html" class="active">Boating Hacks</a>
+      </nav>
       <a class="btn btn-primary small" href="estimate.html">Get an estimate</a>
     </div>
   </header>
@@ -51,7 +83,7 @@
   <main class="estimate-page">
     <section class="container page-header">
       <h1>Beginner’s Guide to Docking a Boat (2025)</h1>
-      <p class="muted">Docking is calm when you have a plan. This step-by-step playbook covers setup, reading wind/current, approach angles, gear “bursts,” crew signals, and a tie-up order that works in most conditions—plus how to wave off and try again. Save it for your next outing.</p>
+      <p class="muted">Docking is calm when you have a plan. This step-by-step playbook covers setup, reading wind/current, approach angles, gear “bursts,” crew signals, and a tie-up order that works in most conditions—plus how to wave off and try again.</p>
     </section>
 
     <!-- On this page -->
@@ -59,146 +91,87 @@
       <div class="toc-card card">
         <p class="toc-eyebrow">On this page</p>
         <ol class="steps">
-          <li>
-            <a href="#prep" data-scroll>
-              <span class="step-badge">1</span>
-              <span class="step-title">Prep: fenders, lines, checklist</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#read" data-scroll>
-              <span class="step-badge">2</span>
-              <span class="step-title">Read wind & current (pick your side)</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#approach" data-scroll>
-              <span class="step-badge">3</span>
-              <span class="step-title">Approach plan & angle (30–45°)</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#control" data-scroll>
-              <span class="step-badge">4</span>
-              <span class="step-title">Control: in-gear bursts, neutral, pivot</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#crew" data-scroll>
-              <span class="step-badge">5</span>
-              <span class="step-title">Crew roles & hand signals</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#tieup" data-scroll>
-              <span class="step-badge">6</span>
-              <span class="step-title">Tie-up order (spring → bow → stern)</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
-          <li>
-            <a href="#depart" data-scroll>
-              <span class="step-badge">7</span>
-              <span class="step-title">Depart, wave-offs & tricky scenarios</span>
-              <span class="step-arrow">↳</span>
-            </a>
-          </li>
+          <li><a href="#prep" data-scroll><span class="step-badge">1</span><span>Prep: fenders, lines, checklist</span></a></li>
+          <li><a href="#read" data-scroll><span class="step-badge">2</span><span>Read wind & current (pick your side)</span></a></li>
+          <li><a href="#approach" data-scroll><span class="step-badge">3</span><span>Approach plan & angle (30–45°)</span></a></li>
+          <li><a href="#control" data-scroll><span class="step-badge">4</span><span>Control: in-gear bursts, neutral, pivot</span></a></li>
+          <li><a href="#crew" data-scroll><span class="step-badge">5</span><span>Crew roles & hand signals</span></a></li>
+          <li><a href="#tieup" data-scroll><span class="step-badge">6</span><span>Tie-up order (spring → bow → stern)</span></a></li>
+          <li><a href="#depart" data-scroll><span class="step-badge">7</span><span>Depart, wave-offs & tricky scenarios</span></a></li>
         </ol>
       </div>
     </section>
 
     <!-- Steps -->
     <section class="container steps-section">
-      <!-- 1 -->
       <div id="prep" class="card big">
         <h2 style="margin-top:0;">1) Prep: Fenders, Lines, Checklist</h2>
         <ul>
-          <li><strong>Fenders:</strong> Hang 2–3 on the docking side at rub-rail height; one near the widest beam, one forward, one aft.</li>
-          <li><strong>Lines:</strong> Bow, stern, and a mid-ship <em>spring line</em> pre-rigged & cleated on the boat with the bitter end ready.</li>
-          <li><strong>Tools:</strong> Boat hook ready, PFDs on small crew, gloves optional.</li>
-          <li><strong>Engines/Helm:</strong> Trim set for idle control, wheel centered; brief the plan before you turn toward the dock.</li>
+          <li><strong>Fenders:</strong> Hang 2–3 on the docking side at rub-rail height; one near beam, one forward, one aft.</li>
+          <li><strong>Lines:</strong> Bow, stern, and a mid-ship <em>spring line</em> pre-rigged and cleated, bitter end ready.</li>
+          <li><strong>Tools:</strong> Boat hook ready; PFDs on small crew; gloves optional.</li>
+          <li><strong>Helm:</strong> Trim set; wheel centered; brief the plan before turning toward the dock.</li>
         </ul>
-        <p class="muted">Pros practice in open water first: idle → in-gear for 1–2 seconds → neutral. That pulse is your main “brake.”</p>
+        <p class="muted">Practice pulses in open water: idle → in-gear 1–2s → neutral. Most of docking is in neutral.</p>
       </div>
 
-      <!-- 2 -->
       <div id="read" class="card big">
         <h2>2) Read Wind & Current (Pick Your Side)</h2>
-        <p>Pick the side that lets wind/current <em>push you on</em> to the dock, not off. If you must dock on the lee side, plan extra angle and speed control.</p>
+        <p>Choose the side that lets wind/current <em>push you on</em> to the dock. If you must dock on the lee side, plan extra angle and speed control.</p>
         <ul>
-          <li><strong>Flags, ripples, docked boats</strong> = quick tells of wind/current.</li>
-          <li><strong>Set a target cleat</strong> on the dock where your mid-ship will stop.</li>
-          <li><strong>Tight marinas:</strong> Call “one-way traffic” turns early and give way to outbound boats.</li>
+          <li>Use flags, ripples, and nearby boats to read set & drift.</li>
+          <li>Pick a <strong>target cleat</strong> where your mid-ship will stop.</li>
         </ul>
       </div>
 
-      <!-- 3 -->
       <div id="approach" class="card big">
         <h2>3) Approach Plan & Angle (30–45°)</h2>
-        <p>Come in at idle on a <strong>30–45° angle</strong> to the dock, aiming your helm (or console) toward the target cleat. As you close within a boat length, shift to neutral and let momentum carry you.</p>
-        <ul>
-          <li><strong>Speed:</strong> “Never approach the dock faster than you’re willing to hit it.” Idle only.</li>
-          <li><strong>At one beam width:</strong> A brief reverse burst checks speed and squares you up.</li>
-          <li><strong>Twin engines:</strong> Favor gentle opposing pulses instead of big wheel turns.</li>
-        </ul>
+        <p>Come in at idle on a 30–45° angle toward your target cleat. Within a boat length, shift to neutral and let momentum carry you. A brief reverse burst checks speed and squares you up.</p>
       </div>
 
-      <!-- 4 -->
       <div id="control" class="card big">
         <h2>4) Control: In-Gear Bursts, Neutral, Pivot</h2>
         <ul>
-          <li><strong>Pulses:</strong> Nudge in/out of gear for 1–2 seconds; spend most time in neutral.</li>
-          <li><strong>Pivot point:</strong> Outboards/IOs pivot near the outdrive; use brief reverse to pull the stern in.</li>
-          <li><strong>Wheel:</strong> Small inputs. Avoid constant throttle—pulses are precision, throttle is chaos.</li>
-          <li><strong>Distance:</strong> If you drift off > half a beam, <em>wave off</em> and reset. No hero saves.</li>
+          <li>Short forward/reverse pulses; avoid constant throttle.</li>
+          <li>Reverse pulls the stern in; use small wheel inputs.</li>
+          <li>If you drift off &gt; half a beam, wave off and reset.</li>
         </ul>
       </div>
 
-      <!-- 5 -->
       <div id="crew" class="card big">
         <h2>5) Crew Roles & Hand Signals</h2>
         <ul>
-          <li><strong>Assign:</strong> One line handler at mid-ship (spring line), one ready with bow or stern line.</li>
-          <li><strong>No jumping:</strong> Step down when the boat has stopped; keep feet/hands off between boat and dock.</li>
-          <li><strong>Signals:</strong> “Stop” palm up; “More line” hand-over-hand; call out distances: “10… 5… 2.”</li>
+          <li>Assign mid-ship handler on the spring; bow/stern ready.</li>
+          <li>No jumping—step down only when stopped; never put hands/feet between boat and dock.</li>
+          <li>Use clear distance calls: “10… 5… 2.”</li>
         </ul>
       </div>
 
-      <!-- 6 -->
       <div id="tieup" class="card big">
-        <h2>6) Tie-Up Order That Just Works</h2>
+        <h2>6) Tie-Up Order That Works</h2>
         <ol>
-          <li><strong>Spring line first:</strong> Mid-ship to a dock cleat <em>ahead</em> of the boat. Shift to <strong>forward idle against the spring</strong> to pin the boat gently alongside.</li>
+          <li><strong>Spring first:</strong> To a cleat ahead; hold light forward against it to pin alongside.</li>
           <li><strong>Bow line:</strong> Cleat and snug.</li>
-          <li><strong>Stern line:</strong> Cleat with a touch of slack for tide/wake; adjust fenders last.</li>
+          <li><strong>Stern line:</strong> Cleat with slight slack; adjust fenders last.</li>
         </ol>
-        <p class="muted">Against wind/current, the spring line does the heavy lifting. Power against it lightly; then neutral and tie the rest.</p>
       </div>
 
-      <!-- 7 -->
       <div id="depart" class="card big">
         <h2>7) Depart, Wave-Offs & Tricky Scenarios</h2>
         <ul>
-          <li><strong>Departing:</strong> Leave the spring line for last; put the helm away from the dock, brief reverse pulse, then neutral and ease out.</li>
-          <li><strong>Crosswind pushing you off:</strong> Add more angle and a slightly longer approach; hold momentum with brief forward pulses.</li>
-          <li><strong>Crosswind pushing you on:</strong> Come in flatter; control closing speed with early reverse.</li>
-          <li><strong>Wave-off:</strong> Shift to neutral, steer away, add reverse pulse to stop, then go set up again. It’s a pro move.</li>
+          <li>Spring line last; helm away; brief reverse pulse; ease out.</li>
+          <li>Crosswind off: more angle and hold with short forward pulses.</li>
+          <li>Crosswind on: flatter approach; early reverse to control closing speed.</li>
         </ul>
-        <p class="muted">Practice when the marina is quiet. Slow is smooth; smooth is fast.</p>
       </div>
     </section>
 
-    <!-- Bottom-only CTA -->
+    <!-- Bottom CTA -->
     <section class="estimate-section" style="margin-top:18px;">
       <div class="container cta-strip">
         <div>
           <h2 style="margin:0;">New to docking? Start with confidence.</h2>
-          <p class="muted" style="margin:4px 0 0;">A quick, market-aware estimate can help you choose upgrades (like fenders/lines) without overspending. Get a fast range for your boat.</p>
+          <p class="muted" style="margin:4px 0 0;">A quick estimate can help you choose upgrades (fenders/lines) without overspending.</p>
         </div>
         <a class="btn btn-primary" href="estimate.html">Get My Instant Estimate</a>
       </div>
@@ -211,7 +184,7 @@
       <div class="footer-links">
         <a href="index.html">Home</a>
         <a href="estimate.html">Estimate</a>
-        <a href="DockingGuide.html">Docking Guide</a>
+        <a href="boating-hacks.html">Boating Hacks</a>
       </div>
     </div>
   </footer>
@@ -232,4 +205,3 @@
   </script>
 </body>
 </html>
-
