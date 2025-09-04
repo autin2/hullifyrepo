@@ -3,10 +3,45 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Boating Hacks — Tips & Guides | Hullify</title>
-  <meta name="description" content="A simple hub for practical boating guides. Read our Selling Tips to price and sell faster, and a calm, step-by-step Docking Guide for stress-free arrivals.">
+  <title>Boating Hacks — Practical Tips & Guides | Hullify</title>
+  <meta name="description" content="A simple hub for practical boating guides. Read our Boat Selling Tips to price and sell faster, and a calm, step-by-step Docking Guide for stress-free arrivals."/>
+  <link rel="canonical" href="https://hullify.com/boating-hacks.html"/>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css"/>
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Boating Hacks — Practical Tips & Guides">
+  <meta property="og:description" content="Selling Tips and a Beginner’s Docking Guide—concise, calm, and actionable.">
+  <meta property="og:url" content="https://hullify.com/boating-hacks.html">
+  <meta property="og:image" content="https://hullify.com/images/og-hacks.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Boating Hacks — Practical Tips & Guides">
+  <meta name="twitter:description" content="Practical guides to help you enjoy the water and decide confidently.">
+  <meta name="twitter:image" content="https://hullify.com/images/og-hacks.jpg">
+
+  <!-- JSON-LD: ItemList of guides -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"ItemList",
+    "name":"Boating Hacks",
+    "itemListElement":[
+      {
+        "@type":"ListItem",
+        "position":1,
+        "name":"Boat Selling Tips (2025): Price Right, Sell Faster",
+        "url":"https://hullify.com/selling-tips.html"
+      },
+      {
+        "@type":"ListItem",
+        "position":2,
+        "name":"Beginner’s Guide to Docking a Boat",
+        "url":"https://hullify.com/DockingGuide.html"
+      }
+    ]
+  }
+  </script>
   <style>
     .hub-intro { margin-top: 6px; }
     .guides-grid { display:grid; grid-template-columns:1fr; gap:14px; }
@@ -14,16 +49,18 @@
     .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); }
     .guide-card:hover { background: rgba(0,0,0,.03); }
     .guide-meta { font-size:12px; color:var(--muted,#6b7280); margin:6px 0 0; }
+    .search { margin: 12px 0 2px; }
+    .search input { width:100%; padding:10px 12px; border:1px solid var(--border); border-radius:10px; }
   </style>
 </head>
 <body>
   <header class="site-header">
     <div class="container nav">
       <div class="brand">
-        <span class="logo-dot"></span>
+        <span class="logo-dot" aria-hidden="true"></span>
         <span>Hullify</span>
       </div>
-      <nav class="nav-links">
+      <nav class="nav-links" aria-label="Primary">
         <a href="index.html">Home</a>
         <a href="estimate.html">Estimate</a>
         <a href="index.html#reviews">Reviews</a>
@@ -37,17 +74,20 @@
     <section class="container page-header">
       <h1>Boating Hacks — Tips & Guides</h1>
       <p class="muted hub-intro">Practical, no-drama guides to help you enjoy the water and make smarter decisions. Pick a topic below.</p>
+      <div class="search" role="search">
+        <input type="search" name="q" placeholder="Search boating tips..." aria-label="Search boating tips">
+      </div>
     </section>
 
     <section class="container">
-      <div class="guides-grid">
-        <a class="guide-card card" href="selling-tips.html">
+      <div class="guides-grid" role="list">
+        <a class="guide-card card" role="listitem" href="selling-tips.html">
           <h3>Boat Selling Tips (2025): Price Right, Sell Faster</h3>
           <p>A 7-step checklist for pricing bands, timing, prep, standout photos, concise listings, and safe messaging—plus a nudge to grab a quick value estimate first.</p>
           <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
         </a>
 
-        <a class="guide-card card" href="DockingGuide.html">
+        <a class="guide-card card" role="listitem" href="DockingGuide.html">
           <h3>Beginner’s Guide to Docking a Boat</h3>
           <p>Calm, step-by-step docking: set fenders/lines, read wind & current, approach at 30–45°, use short gear bursts, set the spring line first, and depart cleanly.</p>
           <p class="guide-meta">Read time: 5–7 min · Updated 2025</p>
@@ -55,7 +95,6 @@
       </div>
     </section>
 
-    <!-- CTA strip -->
     <section class="estimate-section" style="margin-top:18px;">
       <div class="container cta-strip">
         <div>
@@ -70,7 +109,7 @@
   <footer class="site-footer">
     <div class="container footer-grid">
       <div>© <span id="year"></span> Hullify</div>
-      <div class="footer-links">
+      <div class="footer-links" aria-label="Footer">
         <a href="index.html">Home</a>
         <a href="estimate.html">Estimate</a>
         <a href="boating-hacks.html">Boating Hacks</a>
