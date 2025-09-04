@@ -4,7 +4,7 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Boating Hacks — Practical Tips & Guides | Hullify</title>
-  <meta name="description" content="A simple hub for practical boating guides: Selling Tips, a calm Docking Guide, essential Safety Tips, Best Food For Boating, and Sailboats 101 with trim & maneuvers."/>
+  <meta name="description" content="A simple hub for practical boating guides: Selling Tips, a calm Docking Guide, essential Safety Tips, Best Food For Boating, Sailboats 101, and Types of Boats explained."/>
   <link rel="canonical" href="https://hullify.com/boating-hacks.html"/>
   <link rel="icon" href="/favicon.ico" type="image/x-icon">
   <link rel="stylesheet" href="style.css"/>
@@ -12,7 +12,7 @@
   <!-- Open Graph / Twitter -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="Boating Hacks — Practical Tips & Guides">
-  <meta property="og:description" content="Selling Tips, Docking Guide, Safety Tips, Food ideas, and Sailing basics—concise, calm, and actionable.">
+  <meta property="og:description" content="Selling Tips, Docking Guide, Safety Tips, Boat Food ideas, Sailing basics, and Types of Boats—concise, calm, and actionable.">
   <meta property="og:url" content="https://hullify.com/boating-hacks.html">
   <meta property="og:image" content="https://hullify.com/images/og-hacks.jpg">
   <meta name="twitter:card" content="summary_large_image">
@@ -31,7 +31,8 @@
       {"@type":"ListItem","position":2,"name":"Beginner’s Guide to Docking a Boat","url":"https://hullify.com/DockingGuide.html"},
       {"@type":"ListItem","position":3,"name":"Essential Boating Safety Tips","url":"https://hullify.com/Safety-Tips.html"},
       {"@type":"ListItem","position":4,"name":"Best Food For Boating — Easy, No-Mess Ideas","url":"https://hullify.com/Best-Food-For-Boating.html"},
-      {"@type":"ListItem","position":5,"name":"Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes","url":"https://hullify.com/Sailboats.html"}
+      {"@type":"ListItem","position":5,"name":"Sailboats 101 — What You Need, Trim & Maneuvers","url":"https://hullify.com/Sailboats.html"},
+      {"@type":"ListItem","position":6,"name":"Types of Boats — Photos, Uses & Tips","url":"https://hullify.com/Types-of-Boats.html"}
     ]
   }
   </script>
@@ -39,7 +40,7 @@
   <style>
     .hub-intro { margin-top: 6px; }
     .guides-grid { display:grid; grid-template-columns:1fr; gap:14px; }
-    /* Exactly 3 per row on wide screens so #4 & #5 wrap neatly */
+    /* Keep exactly 3 per row on wide screens so items wrap cleanly */
     @media (min-width: 900px){ .guides-grid{ grid-template-columns: repeat(3, 1fr); } }
     .guide-card { display:block; padding:16px; border:1px solid var(--border); border-radius:12px; text-decoration:none; color:inherit; background:var(--surface,#fff); transition:background .15s ease; }
     .guide-card:hover { background: rgba(0,0,0,.03); }
@@ -79,17 +80,17 @@
 
       <!-- Search -->
       <form id="searchForm" class="search" role="search" aria-label="Filter guides">
-        <input id="hacksSearch" type="search" name="q" placeholder="Search boating tips (e.g., docking, safety, food, sailing, sell)…" autocomplete="off" />
+        <input id="hacksSearch" type="search" name="q" placeholder="Search boating tips (e.g., docking, safety, food, sailing, types, sell)…" autocomplete="off" />
         <button type="button" id="clearSearch" aria-label="Clear search">Clear</button>
       </form>
       <p class="search-note" aria-live="polite">
-        <span id="resultCount">Showing 5 guides</span>
+        <span id="resultCount">Showing 6 guides</span>
       </p>
     </section>
 
     <section class="container">
       <div id="guidesGrid" class="guides-grid" role="list">
-        <a class="guide-card card" role="listitem" href="selling-tips.html" data-keywords="price pricing sell listing photos video messages safety">
+        <a class="guide-card card" role="listitem" href="selling-tips.html" data-keywords="price pricing sell listing photos video messages">
           <h3>Boat Selling Tips (2025): Price Right, Sell Faster</h3>
           <p>A 7-step checklist for pricing bands, timing, prep, standout photos, concise listings, and safe messaging—plus a nudge to grab a quick value estimate first.</p>
           <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
@@ -113,16 +114,22 @@
           <p class="guide-meta">Read time: 5–7 min · Updated 2025</p>
         </a>
 
-        <!-- NEW: Sailing guide -->
-        <a class="guide-card card" role="listitem" href="Sailboats.html" data-keywords="sailing sailboats trim points of sail tacking gybing reefing right of way heave-to">
-          <h3>Sailboats 101 — Sailing Basics, Trim, Tacks & Gybes</h3>
-          <p>Learn points of sail, trim with telltales, tack & gybe step-by-step, reef early, heave-to, and know right-of-way rules. Clear diagrams & checklists.</p>
+        <a class="guide-card card" role="listitem" href="Sailboats.html" data-keywords="sailing sailboats trim points of sail tacking gybing reefing heave-to right of way">
+          <h3>Sailboats 101 — What You Need, Trim & Maneuvers</h3>
+          <p>Gear you actually need, rig basics, points of sail, trim rules, safe tacks & gybes, reef early, and heave-to—written for calm, confident starts.</p>
           <p class="guide-meta">Read time: 7–9 min · Updated 2025</p>
+        </a>
+
+        <!-- NEW: Types of Boats -->
+        <a class="guide-card card" role="listitem" href="Types-of-Boats.html" data-keywords="boat types catamaran center console sportfisher bowrider pontoon trawler rib deck boat bass jon">
+          <h3>Types of Boats — Photos, Uses & Tips</h3>
+          <p>A visual guide to common boat styles—catamaran, center console, sportfisher, bowrider, pontoon, trawler, RIB, deck boat, and more—with plain-English use cases.</p>
+          <p class="guide-meta">Read time: 6–8 min · Updated 2025</p>
         </a>
       </div>
 
       <div id="noResults" class="no-results hidden" role="status" aria-live="polite">
-        No guides match your search. Try “dock,” “safety,” “sailing,” “sell,” or “food,” or <a href="boating-hacks.html">show all</a>.
+        No guides match your search. Try “dock,” “safety,” “sailing,” “types,” “sell,” or “food,” or <a href="boating-hacks.html">show all</a>.
       </div>
     </section>
 
