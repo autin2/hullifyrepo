@@ -25,7 +25,7 @@ export default async function handler(req, res) {
     const priceMap = {
       reveal_199: {
         name: "Reveal Estimate (on-page)",
-        unit_amount: 199, // $1.99
+        unit_amount: 099, // $0.99
       },
       pdf_1900: {
         name: "Sell-Ready PDF (with Trend Chart)",
@@ -65,4 +65,5 @@ export default async function handler(req, res) {
     res.status(500).json({ error: "Failed to create checkout session" });
   }
 }
+
 
