@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="top">
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -45,18 +45,11 @@
   }
   </script>
 
-  <!-- Page-local layout helpers (works with your existing CSS) -->
+  <!-- Page-local layout helpers -->
   <style>
-    .toc-card { padding:14px 16px; border:1px solid var(--border); border-radius:12px; background: var(--surface, #fff); }
-    .toc-eyebrow { font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted,#6b7280); margin:0 0 6px; }
-    .toc { list-style:none; margin:0; padding:0; }
-    .toc li { border-top:1px solid var(--border); }
-    .toc li:first-child { border-top:0; }
-    .toc a { display:flex; gap:10px; padding:10px 2px; text-decoration:none; color:inherit; }
-    .toc a:hover { background: rgba(0,0,0,.04); border-radius:8px; }
-
     .types-grid { display:grid; grid-template-columns:1fr; gap:16px; }
     @media (min-width: 900px){ .types-grid { grid-template-columns: 1fr 1fr; } }
+
     .boat-card { border:1px solid var(--border); border-radius:12px; background:var(--surface,#fff); overflow:hidden; }
     .boat-media { aspect-ratio: 16/9; background: linear-gradient(135deg, #e8eefc, #f5f7fb); display:flex; align-items:center; justify-content:center; border-bottom:1px solid var(--border); }
     .boat-media img { width:100%; height:100%; object-fit:cover; display:block; }
@@ -67,8 +60,35 @@
     .bullets { margin:0; padding-left:18px; }
     .bullets li { margin:4px 0; }
     .cta { margin-top:10px; display:flex; gap:8px; flex-wrap:wrap; }
-    .img-note { font-size:12px; color:var(--muted,#6b7280); text-align:center; padding:6px 0 0; }
-    .backtop { text-align:center; margin-top:14px; }
+    .img-note { font-size:12px; color:var(--muted,#6b7280); text-align:left; padding:6px 0 0; }
+
+    /* Floating back-to-top button */
+    #backTop {
+      position: fixed;
+      right: 22px;
+      bottom: 22px;
+      width: 46px;
+      height: 46px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(0,0,0,.12);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px);
+      transition: opacity .2s ease, transform .2s ease, visibility .2s ease;
+      z-index: 50;
+    }
+    #backTop.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    #backTop:hover { background: rgba(0,0,0,.03); }
+    #backTop span { font-size: 20px; line-height: 1; }
   </style>
 </head>
 <body>
@@ -94,34 +114,12 @@
       <p class="muted">Shopping or just learning the lingo? Here’s a plain-English tour of common boat styles and when to choose each. Drop your photos right into the image slots—filenames are listed under every card.</p>
     </section>
 
-    <!-- On this page -->
-    <section class="container" role="navigation" aria-label="Jump to a boat type">
-      <div class="toc-card card">
-        <p class="toc-eyebrow">On this page</p>
-        <ul class="toc">
-          <li><a href="#catamaran" data-scroll>Catamaran</a></li>
-          <li><a href="#center-console" data-scroll>Center Console</a></li>
-          <li><a href="#sportfisher" data-scroll>Sportfisher</a></li>
-          <li><a href="#bowrider" data-scroll>Bowrider</a></li>
-          <li><a href="#pontoon" data-scroll>Pontoon</a></li>
-          <li><a href="#cabin-cruiser" data-scroll>Cabin Cruiser</a></li>
-          <li><a href="#trawler" data-scroll>Trawler</a></li>
-          <li><a href="#rib" data-scroll>RIB / Inflatable</a></li>
-          <li><a href="#wakeboat" data-scroll>Wake / Ski Boat</a></li>
-          <li><a href="#bass-boat" data-scroll>Bass Boat</a></li>
-          <li><a href="#jon-boat" data-scroll>Jon Boat</a></li>
-          <li><a href="#deck-boat" data-scroll>Deck Boat</a></li>
-        </ul>
-      </div>
-    </section>
-
     <!-- Types -->
     <section class="container types-grid">
       <!-- CATAMARAN -->
       <article id="catamaran" class="boat-card">
         <figure class="boat-media">
-          <!-- Place your image file in the same folder and keep this filename -->
-          <img src="type-catamaran.jpg" alt="Sailing catamaran with twin hulls underway" loading="lazy" width="1200" height="675">
+          <img src="type-catamaran.png" alt="Sailing catamaran with twin hulls underway" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Catamaran</h2>
@@ -135,16 +133,15 @@
           </ul>
           <div class="cta">
             <a class="btn btn-ghost" href="Sailboats.html">Learn sailing basics</a>
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
           </div>
-          <p class="img-note">Image file: <code>type-catamaran.jpg</code></p>
+          <p class="img-note">Image file: <code>type-catamaran.png</code></p>
         </div>
       </article>
 
       <!-- CENTER CONSOLE -->
       <article id="center-console" class="boat-card">
         <figure class="boat-media">
-          <img src="type-center-console.jpg" alt="Center console fishing boat with T-top" loading="lazy" width="1200" height="675">
+          <img src="type-center-console.png" alt="Center console fishing boat with T-top" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Center Console</h2>
@@ -158,16 +155,15 @@
           </ul>
           <div class="cta">
             <a class="btn btn-ghost" href="selling-tips.html">Selling tips</a>
-            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
           </div>
-          <p class="img-note">Image file: <code>type-center-console.jpg</code></p>
+          <p class="img-note">Image file: <code>type-center-console.png</code></p>
         </div>
       </article>
 
       <!-- SPORTFISHER -->
       <article id="sportfisher" class="boat-card">
         <figure class="boat-media">
-          <img src="type-sportfisher.jpg" alt="Offshore sportfisher with tower running through chop" loading="lazy" width="1200" height="675">
+          <img src="type-sportfisher.png" alt="Offshore sportfisher with tower running through chop" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Sportfisher (Offshore)</h2>
@@ -178,14 +174,17 @@
             <li>Deep-V hulls, long range, towers, outriggers—built to chase pelagics.</li>
             <li>Comfortable cabins for overnights; higher fuel/maintenance costs.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-sportfisher.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-sportfisher.png</code></p>
         </div>
       </article>
 
       <!-- BOWRIDER -->
       <article id="bowrider" class="boat-card">
         <figure class="boat-media">
-          <img src="type-bowrider.jpg" alt="Bowrider runabout with open seating in the bow" loading="lazy" width="1200" height="675">
+          <img src="type-bowrider.png" alt="Bowrider runabout with open seating in the bow" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Bowrider</h2>
@@ -196,14 +195,17 @@
             <li>Open bow seating = social layout; easy trailer & storage sizes.</li>
             <li>Good for tubing and coves; not ideal for big offshore days.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-bowrider.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-bowrider.png</code></p>
         </div>
       </article>
 
       <!-- PONTOON -->
       <article id="pontoon" class="boat-card">
         <figure class="boat-media">
-          <img src="type-pontoon.jpg" alt="Pontoon boat with bimini and lounge seating" loading="lazy" width="1200" height="675">
+          <img src="type-pontoon.png" alt="Pontoon boat with bimini and lounge seating" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Pontoon</h2>
@@ -214,14 +216,17 @@
             <li>Massive deck space; simple operation and low draft.</li>
             <li>Tri-toons add speed and rough-water capability.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-pontoon.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-pontoon.png</code></p>
         </div>
       </article>
 
       <!-- CABIN CRUISER -->
       <article id="cabin-cruiser" class="boat-card">
         <figure class="boat-media">
-          <img src="type-cabin-cruiser.jpg" alt="Cabin cruiser at anchor with hardtop" loading="lazy" width="1200" height="675">
+          <img src="type-cabin-cruiser.png" alt="Cabin cruiser at anchor with hardtop" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Cabin Cruiser</h2>
@@ -232,14 +237,17 @@
             <li>V-berth, galley, enclosed head; perfect for weekend trips.</li>
             <li>Heavier and thirstier—budget for dockage and upkeep.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-cabin-cruiser.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-cabin-cruiser.png</code></p>
         </div>
       </article>
 
       <!-- TRAWLER -->
       <article id="trawler" class="boat-card">
         <figure class="boat-media">
-          <img src="type-trawler.jpg" alt="Displacement trawler cruising with flybridge" loading="lazy" width="1200" height="675">
+          <img src="type-trawler.png" alt="Displacement trawler cruising with flybridge" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Trawler</h2>
@@ -250,14 +258,17 @@
             <li>Slow and steady diesel cruiser; huge range and comfort.</li>
             <li>Great for the ICW and extended trips; not a speed boat.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-trawler.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-trawler.png</code></p>
         </div>
       </article>
 
       <!-- RIB -->
       <article id="rib" class="boat-card">
         <figure class="boat-media">
-          <img src="type-rib.jpg" alt="Rigid inflatable boat (RIB) with console and tubes" loading="lazy" width="1200" height="675">
+          <img src="type-rib.png" alt="Rigid inflatable boat (RIB) with console and tubes" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>RIB / Inflatable</h2>
@@ -268,14 +279,17 @@
             <li>Light, stable, beach-friendly; common as tenders and safety boats.</li>
             <li>Tubes can puncture—check fabric and seams when buying used.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-rib.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-rib.png</code></p>
         </div>
       </article>
 
       <!-- WAKE / SKI -->
       <article id="wakeboat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-wakeboat.jpg" alt="Wake boat with tower and surf wave" loading="lazy" width="1200" height="675">
+          <img src="type-wakeboat.png" alt="Wake boat with tower and surf wave" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Wake / Ski Boat</h2>
@@ -286,14 +300,17 @@
             <li>Inboard power with ballast to shape wakes/waves.</li>
             <li>Lake fun champ; not ideal for salt or long runs.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-wakeboat.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-wakeboat.png</code></p>
         </div>
       </article>
 
       <!-- BASS BOAT -->
       <article id="bass-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-bass-boat.jpg" alt="Bass boat with trolling motor and casting decks" loading="lazy" width="1200" height="675">
+          <img src="type-bass-boat.png" alt="Bass boat with trolling motor and casting decks" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Bass Boat</h2>
@@ -304,14 +321,17 @@
             <li>Low profile, big casting decks, livewells, and trolling motor.</li>
             <li>Best on lakes/rivers; low freeboard in chop.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-bass-boat.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-bass-boat.png</code></p>
         </div>
       </article>
 
       <!-- JON BOAT -->
       <article id="jon-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-jon-boat.jpg" alt="Light aluminum jon boat on a quiet river" loading="lazy" width="1200" height="675">
+          <img src="type-jon-boat.png" alt="Light aluminum jon boat on a quiet river" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Jon Boat</h2>
@@ -322,14 +342,17 @@
             <li>Flat bottom = super shallow draft for creeks and marshes.</li>
             <li>Simple, tough, easy to trailer; not for rough water.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-jon-boat.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-jon-boat.png</code></p>
         </div>
       </article>
 
       <!-- DECK BOAT -->
       <article id="deck-boat" class="boat-card">
         <figure class="boat-media">
-          <img src="type-deck-boat.jpg" alt="Deck boat with wide bow seating underway" loading="lazy" width="1200" height="675">
+          <img src="type-deck-boat.png" alt="Deck boat with wide bow seating underway" loading="lazy" width="1200" height="675">
         </figure>
         <div class="boat-body">
           <h2>Deck Boat</h2>
@@ -340,25 +363,19 @@
             <li>Hybrid of bowrider + pontoon: wide bow, lots of seating.</li>
             <li>Handles chop better than pontoons of similar size.</li>
           </ul>
-          <p class="img-note">Image file: <code>type-deck-boat.jpg</code></p>
+          <div class="cta">
+            <a class="btn btn-primary" href="estimate.html">Get value estimate</a>
+          </div>
+          <p class="img-note">Image file: <code>type-deck-boat.png</code></p>
         </div>
       </article>
     </section>
-
-    <section class="container backtop">
-      <a href="#top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">Back to top ↑</a>
-    </section>
-
-    <section class="estimate-section" style="margin-top:18px;">
-      <div class="container cta-strip">
-        <div>
-          <h2 style="margin:0;">Comparing options? Know your budget range.</h2>
-          <p class="muted" style="margin:4px 0 0;">Get a fast estimate on your current boat to plan the next move.</p>
-        </div>
-        <a class="btn btn-primary" href="estimate.html">Get My Instant Estimate</a>
-      </div>
-    </section>
   </main>
+
+  <!-- Pretty floating Back to Top -->
+  <button id="backTop" aria-label="Back to top" title="Back to top">
+    <span>↑</span>
+  </button>
 
   <footer class="site-footer">
     <div class="container footer-grid">
@@ -372,7 +389,7 @@
   </footer>
 
   <script>
-    // Smooth in-page scrolling
+    // Smooth scroll for any # links (if you add some later)
     document.querySelectorAll('a[data-scroll]').forEach(a => {
       a.addEventListener('click', (e) => {
         const id = a.getAttribute('href');
@@ -383,7 +400,25 @@
         }
       });
     });
+
+    // Floating Back to Top behavior
+    const backTop = document.getElementById('backTop');
+    function toggleBackTop(){
+      if (window.scrollY > 400) {
+        backTop.classList.add('show');
+      } else {
+        backTop.classList.remove('show');
+      }
+    }
+    window.addEventListener('scroll', toggleBackTop);
+    backTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
+    // Initialize button state
+    toggleBackTop();
   </script>
 </body>
 </html>
